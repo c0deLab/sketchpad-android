@@ -17,12 +17,12 @@ public class Generic extends Point {
     public void update(Cursor c, boolean isFinal) {
 
         Point target = c.target();
-        int dx = target.x - this.x;
-        int dy = target.y - this.y;
+        int dx = target.x - x;
+        int dy = target.y - y;
 
         original.move(dx, dy);
 
-        this.x += dx;
-        this.y += dy;
+        x += dx;
+        y += dy;
     }
 }

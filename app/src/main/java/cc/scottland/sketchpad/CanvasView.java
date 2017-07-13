@@ -134,16 +134,14 @@ public class CanvasView extends View {
             if (is("moving")) break; // but not if we're moving an object
             if (object == activeObj) break;
 
-            Shape near = object.near(cursor.target());
+            Shape near = object.near(cursor);
             if (near == null) continue;
 
             cursor.on(near);
         }
 
         // update active object, if it exists
-        if (activeObj != null) {
-            activeObj.update(cursor, isFinal);
-        }
+        if (activeObj != null) activeObj.update(cursor, isFinal);
 
         invalidate();
         requestLayout();
@@ -152,6 +150,8 @@ public class CanvasView extends View {
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
 
+        if (!isTouchDown) return false;
+
         switch (keyCode) {
             case KeyEvent.KEYCODE_1:
                 return createCircle();
@@ -159,6 +159,8 @@ public class CanvasView extends View {
                 return createLine();
             case KeyEvent.KEYCODE_3:
                 return moveObject();
+            case KeyEvent.KEYCODE_5:
+                return deleteObject();
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -166,7 +168,6 @@ public class CanvasView extends View {
 
     public boolean createCircle() {
 
-        if (!isTouchDown) return false;
         if (this.is("drawing")) return false;
 
         this.toggleAction("drawing");
@@ -181,7 +182,6 @@ public class CanvasView extends View {
 
     public boolean createLine() {
 
-        if (!isTouchDown) return false;
         if (is("drawing")) return false;
 
         this.toggleAction("drawing");
@@ -200,8 +200,7 @@ public class CanvasView extends View {
 
     public boolean moveObject() {
 
-        if (!isTouchDown) return false;
-        if (!is("moving") || !cursor.isOn()) return false;
+        if (!cursor.isOn()) return false;
 
         for (Shape object : objects) {
             Shape near = object.near(cursor);
@@ -211,6 +210,16 @@ public class CanvasView extends View {
 
         if (activeObj != null) activeObj.update(cursor, false);
 
+        return true;
+    }
+
+    public boolean deleteObject() {
+        if (is("moving") || is("drawing")) return false;
+        List<Shape> remainingObjects = new ArrayList<Shape>();
+        for (Shape object : objects) {
+            if (object.near(cursor) == null) remainingObjects.add(object);
+        }
+        objects = remainingObjects;
         return true;
     }
 }

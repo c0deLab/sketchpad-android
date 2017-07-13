@@ -3,6 +3,7 @@ package cc.scottland.sketchpad.shapes;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import cc.scottland.sketchpad.utils.Utils;
 
@@ -39,8 +40,8 @@ public class Circle extends Point {
 
         Point d = new Point(pt.x - this.x, pt.y - this.y);
         int m = Utils.distance(d, new Point());
-        d.x *= this.r / m;
-        d.y *= this.r / m;
+        d.x *= (float)this.r / m;
+        d.y *= (float)this.r / m;
 
         return new Generic(this.x + d.x, this.y + d.y, this);
     }
