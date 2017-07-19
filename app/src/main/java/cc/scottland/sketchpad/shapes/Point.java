@@ -37,9 +37,13 @@ public class Point implements Shape {
         return Utils.distance(p, this) < 12 ? this : null;
     }
 
-    public Shape clone() {
-        return new Point(this.x, this.y);
+    public Point clone() {
+        return new Point(x, y);
     }
+
+//    public Generic clone(int x, int y) {
+//        return new Generic(x, y, this);
+//    }
 
     public void draw(Canvas canvas) { }
 }

@@ -159,6 +159,8 @@ public class CanvasView extends View {
                 return createLine();
             case KeyEvent.KEYCODE_3:
                 return moveObject();
+            case KeyEvent.KEYCODE_4:
+                return copyObject();
             case KeyEvent.KEYCODE_5:
                 return deleteObject();
             default:
@@ -184,7 +186,7 @@ public class CanvasView extends View {
 
         if (is("drawing")) return false;
 
-        this.toggleAction("drawing");
+        toggleAction("drawing");
 
         Point pt = cursor.target();
         Line line = new Line(
@@ -202,6 +204,10 @@ public class CanvasView extends View {
 
         if (!cursor.isOn()) return false;
 
+        toggleAction("moving");
+
+        if (!is("moving") || !cursor.isOn()) return false;
+
         for (Shape object : objects) {
             Shape near = object.near(cursor);
             if (near == null) continue;
@@ -213,6 +219,37 @@ public class CanvasView extends View {
         return true;
     }
 
+    public boolean copyObject() {
+
+        if (!cursor.isOn()) return false;
+
+        toggleAction("moving");
+
+        if (!is("moving")) return false;
+
+        for (Shape object : objects) {
+            Shape near = object.near(cursor);
+            if (near == null) continue;
+            activeObj = near;
+        }
+
+        // must copy a Generic resulting from near object
+        if (activeObj == null || !(activeObj instanceof Generic)) return false;
+
+        Shape copy = ((Generic)activeObj).original.clone();
+
+        Generic genericCopy = new Generic(
+            cursor.target().x,
+            cursor.target().y,
+            copy
+        );
+
+        objects.add(copy);
+        activeObj = genericCopy;
+
+        return true;
+    }
+
     public boolean deleteObject() {
         if (is("moving") || is("drawing")) return false;
         List<Shape> remainingObjects = new ArrayList<Shape>();
@@ -220,6 +257,10 @@ public class CanvasView extends View {
             if (object.near(cursor) == null) remainingObjects.add(object);
         }
         objects = remainingObjects;
+
+        invalidate();
+        requestLayout();
+
         return true;
     }
 }

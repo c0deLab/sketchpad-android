@@ -54,4 +54,14 @@ public class Circle extends Point {
         p.setStrokeWidth(3);
         canvas.drawCircle(x, y, r, p);
     }
+
+    @Override
+    public Circle clone() {
+        return new Circle(x, y, r);
+    }
+
+//    @Override
+//    public Generic clone(int x, int y) {
+//        return new Generic(x, y, this);
+//    }
 }

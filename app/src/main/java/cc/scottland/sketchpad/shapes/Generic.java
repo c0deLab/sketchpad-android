@@ -1,5 +1,7 @@
 package cc.scottland.sketchpad.shapes;
 
+import android.util.Log;
+
 /**
  * Created by scottdonaldson on 7/12/17.
  */
@@ -25,4 +27,9 @@ public class Generic extends Point {
         x += dx;
         y += dy;
     }
+
+//    @Override
+//    public Generic clone(int x, int y) {
+//        return original;
+//    }
 }

@@ -68,8 +68,11 @@ public class Line implements Shape {
         return null;
     }
 
-    public Shape clone() {
-        return new Line((Point)p1.clone(), (Point)p2.clone());
+    public Line clone() {
+        return new Line(
+            new Point(p1.x, p1.y),
+            new Point(p2.x, p2.y)
+        );
     }
 
     @Override
