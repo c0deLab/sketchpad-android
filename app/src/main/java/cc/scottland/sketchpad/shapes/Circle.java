@@ -64,4 +64,6 @@ public class Circle extends Point {
 //    public Generic clone(int x, int y) {
 //        return new Generic(x, y, this);
 //    }
+
+    public boolean isTruePoint() { return false; }
 }

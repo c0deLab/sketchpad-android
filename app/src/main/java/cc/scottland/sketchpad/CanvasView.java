@@ -18,6 +18,7 @@ import cc.scottland.sketchpad.shapes.Cursor;
 import cc.scottland.sketchpad.shapes.Generic;
 import cc.scottland.sketchpad.shapes.Line;
 import cc.scottland.sketchpad.shapes.Point;
+import cc.scottland.sketchpad.shapes.Polygon;
 import cc.scottland.sketchpad.shapes.Shape;
 
 /**
@@ -163,6 +164,8 @@ public class CanvasView extends View {
                 return copyObject();
             case KeyEvent.KEYCODE_5:
                 return deleteObject();
+            case KeyEvent.KEYCODE_6:
+                return makeRegular();
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -251,15 +254,61 @@ public class CanvasView extends View {
     }
 
     public boolean deleteObject() {
+
         if (is("moving") || is("drawing")) return false;
+
         List<Shape> remainingObjects = new ArrayList<Shape>();
+
         for (Shape object : objects) {
-            if (object.near(cursor) == null) remainingObjects.add(object);
+
+            // if it's a point with no lines, remove it
+            if (object.isTruePoint() && ((Point)object).lines.size() == 0) {
+                object.remove();
+            }
+
+            // if not near the object, keep it
+            if (object.near(cursor) == null) {
+                remainingObjects.add(object);
+            // otherwise, remove it
+            } else {
+                object.remove();
+            }
         }
+
         objects = remainingObjects;
 
         invalidate();
         requestLayout();
+
+        return true;
+    }
+
+    public boolean makeRegular() {
+
+        if (is("moving") || is("drawing")) return false;
+
+        for (Shape object : objects) {
+
+            Shape near = object.near(cursor);
+            if (near == null) continue;
+
+            if (near instanceof Generic) { // circle or line
+                Log.e("near generic", near.toString());
+            } else if (near instanceof Point) {
+                Polygon poly = ((Point)near).seek();
+                if (poly == null) {
+                    Log.e("no polygon found", "nope");
+                } else {
+                    poly.regularize();
+                    invalidate();
+                    requestLayout();
+                    Log.e("polygon", poly.toString());
+                    Log.e("polygon pts", Integer.toString(poly.points.size()));
+                }
+                // only start seeking from closest point
+                return false;
+            }
+        }
 
         return true;
     }

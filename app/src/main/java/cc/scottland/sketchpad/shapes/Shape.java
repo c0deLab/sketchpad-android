@@ -12,4 +12,6 @@ public interface Shape {
     public Shape near(Point p);
     public Shape clone();
     public void draw(Canvas canvas);
+    public void remove();
+    public boolean isTruePoint();
 }

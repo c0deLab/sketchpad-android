@@ -3,6 +3,7 @@ package cc.scottland.sketchpad.shapes;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import cc.scottland.sketchpad.utils.Utils;
 
@@ -18,6 +19,10 @@ public class Line implements Shape {
     public Line(Point p1, Point p2) {
         this.p1 = p1;
         this.p2 = p2;
+
+        // add line to points
+        p1.lines.add(this);
+        p2.lines.add(this);
     }
 
     public void update(Cursor c, boolean isFinal) {
@@ -28,11 +33,19 @@ public class Line implements Shape {
         }
 
         p2 = c.target();
+        p2.lines.add(this);
     }
 
     public void move(int dx, int dy) {
         p1.move(dx, dy);
         p2.move(dx, dy);
+    }
+
+    public void remove() {
+        p1.lines.remove(this);
+        p2.lines.remove(this);
+        p1 = null;
+        p2 = null;
     }
 
     private Point parametrize(double t) {
@@ -83,4 +96,6 @@ public class Line implements Shape {
         p.setStrokeWidth(3);
         canvas.drawLine(p1.x, p1.y, p2.x, p2.y, p);
     }
+
+    public boolean isTruePoint() { return false; }
 }

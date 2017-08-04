@@ -27,4 +27,6 @@ public class Cursor extends Point {
     public Point target() {
         return (Point) (isOn() ? this.at : this.clone());
     }
+
+    public boolean isTruePoint() { return false; }
 }

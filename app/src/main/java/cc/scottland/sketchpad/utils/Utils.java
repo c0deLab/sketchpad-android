@@ -17,4 +17,8 @@ public class Utils {
     public static double dot(Point p1, Point p2) {
         return p1.x * p2.x + p1.y * p2.y;
     }
+
+    public static double angle(Point p1, Point p2) {
+        return Math.toDegrees(Math.atan2(p2.y - p1.y, p2.x - p1.x));
+    }
 }

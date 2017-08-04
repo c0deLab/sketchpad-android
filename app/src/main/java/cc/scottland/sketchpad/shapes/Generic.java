@@ -28,8 +28,10 @@ public class Generic extends Point {
         y += dy;
     }
 
-//    @Override
-//    public Generic clone(int x, int y) {
-//        return original;
-//    }
+    public void remove() {
+        super.remove();
+        this.original = null;
+    }
+
+    public boolean isTruePoint() { return false; }
 }
