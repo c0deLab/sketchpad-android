@@ -25,10 +25,12 @@ public class Line implements Shape {
         p2.lines.add(this);
     }
 
-    public void update(Cursor c, boolean isFinal) {
+    public void update(Cursor c, int x, int y, boolean isFinal) {
+
+        // Point p = new Point(c.x + x, c.y + y);
 
         if (!isFinal || !c.isOn()) {
-            p2.update(c, isFinal);
+            p2.update(c, x, y, isFinal);
             return;
         }
 
@@ -55,7 +57,10 @@ public class Line implements Shape {
         );
     }
 
-    public Shape near(Point pt) {
+    public Shape near(Point pt, int x, int y) {
+
+        pt.x += x;
+        pt.y += y;
 
         int minDistance = 30;
 
@@ -89,12 +94,12 @@ public class Line implements Shape {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas, int x, int y) {
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         p.setColor(Color.WHITE);
         p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(3);
-        canvas.drawLine(p1.x, p1.y, p2.x, p2.y, p);
+        canvas.drawLine(p1.x + x, p1.y + y, p2.x + x, p2.y + y, p);
     }
 
     public boolean isTruePoint() { return false; }

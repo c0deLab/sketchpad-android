@@ -7,11 +7,11 @@ import android.graphics.Canvas;
  */
 
 public interface Shape {
-    public void update(Cursor c, boolean isFinal);
+    public void update(Cursor c, int x, int y, boolean isFinal);
     public void move(int x, int y);
-    public Shape near(Point p);
+    public Shape near(Point p, int x, int y);
     public Shape clone();
-    public void draw(Canvas canvas);
+    public void draw(Canvas canvas, int x, int y);
     public void remove();
     public boolean isTruePoint();
 }

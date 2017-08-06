@@ -26,12 +26,16 @@ public class Circle extends Point {
     }
 
     @Override
-    public void update(Cursor c, boolean isFinal) {
-        this.r = Utils.distance(c, this);
+    public void update(Cursor c, int x, int y, boolean isFinal) {
+        Point p = new Point(c.x - x, c.y - y);
+        this.r = Utils.distance(p, this);
     }
 
     @Override
-    public Shape near(Point pt) {
+    public Shape near(Point pt, int x, int y) {
+
+        pt.x += x;
+        pt.y += y;
 
         int minDistance = 30;
 
@@ -47,23 +51,18 @@ public class Circle extends Point {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas, int x, int y) {
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         p.setColor(Color.WHITE);
         p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(3);
-        canvas.drawCircle(x, y, r, p);
+        canvas.drawCircle(this.x + x, this.y + y, r, p);
     }
 
     @Override
     public Circle clone() {
         return new Circle(x, y, r);
     }
-
-//    @Override
-//    public Generic clone(int x, int y) {
-//        return new Generic(x, y, this);
-//    }
 
     public boolean isTruePoint() { return false; }
 }

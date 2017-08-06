@@ -16,11 +16,11 @@ public class Generic extends Point {
     }
 
     @Override
-    public void update(Cursor c, boolean isFinal) {
+    public void update(Cursor c, int x, int y, boolean isFinal) {
 
         Point target = c.target();
-        int dx = target.x - x;
-        int dy = target.y - y;
+        int dx = target.x - this.x + x;
+        int dy = target.y - this.y + y;
 
         original.move(dx, dy);
 

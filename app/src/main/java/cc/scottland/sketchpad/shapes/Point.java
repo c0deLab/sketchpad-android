@@ -28,9 +28,9 @@ public class Point implements Shape {
         this.y = y;
     }
 
-    public void update(Cursor c, boolean isFinal) {
-        x = c.x;
-        y = c.y;
+    public void update(Cursor c, int x, int y, boolean isFinal) {
+        this.x = c.x + x;
+        this.y = c.y + y;
     }
 
     public void move(int dx, int dy) {
@@ -45,7 +45,9 @@ public class Point implements Shape {
         while (lines.size() > 0) lines.remove(0);
     }
 
-    public Shape near(Point p) {
+    public Shape near(Point p, int x, int y) {
+        p.x += x;
+        p.y += y;
         return Utils.distance(p, this) < 12 ? this : null;
     }
 
@@ -53,11 +55,7 @@ public class Point implements Shape {
         return new Point(x, y);
     }
 
-//    public Generic clone(int x, int y) {
-//        return new Generic(x, y, this);
-//    }
-
-    public void draw(Canvas canvas) { }
+    public void draw(Canvas canvas, int x, int y) { }
 
     public Polygon seek() {
 
