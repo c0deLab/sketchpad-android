@@ -6,6 +6,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import cc.scottland.sketchpad.CanvasView;
 import cc.scottland.sketchpad.utils.Utils;
 
 /**
@@ -22,13 +23,15 @@ public class Polygon implements Shape {
         this.points = points;
     }
 
-    public void update(Cursor c, int x, int y, boolean isFinal) {}
+    public void setCanvasView(CanvasView cv) {}
+
+    public void update(Cursor c, boolean isFinal) {}
 
     public void move(int x, int y) {
         for (Point p : points) p.move(x, y);
     }
 
-    public Shape near(Point p, int x, int y) { return null; }
+    public Shape near(Point p) { return null; }
 
     public Shape clone() {
         List<Point> pts = new ArrayList<Point>();
@@ -36,7 +39,7 @@ public class Polygon implements Shape {
         return new Polygon(pts);
     }
 
-    public void draw(Canvas canvas, int x, int y) {}
+    public void draw(Canvas canvas) {}
 
     public void remove() {
         for (Point p : points) p.remove();

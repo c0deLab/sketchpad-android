@@ -9,6 +9,7 @@ import android.view.View;
 import android.graphics.Canvas;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.Toast;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class CanvasView extends View {
     private List<Shape> objects = new ArrayList<Shape>();
 
     private boolean isTouchDown = false;
-    private Cursor cursor = new Cursor();
+    private Cursor cursor = new Cursor(this);
     private String action = "";
 
     public int x = 0;
@@ -41,13 +42,17 @@ public class CanvasView extends View {
 
     private Shape activeObj;
 
+    private Context context;
+
     public CanvasView(Context context) {
         super(context);
+        this.context = context;
         init();
     }
 
     public CanvasView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
         init();
     }
 
@@ -59,14 +64,19 @@ public class CanvasView extends View {
         paint.setColor(bg);
         canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
 
-        if (isTouchDown) drawCursor(canvas);
-        for (Shape object : objects) object.draw(canvas, x, y);
+        if (isTouchDown) cursor.draw(canvas);
+
+        for (Shape object : objects) object.draw(canvas);
+
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(24);
+        canvas.drawText(Integer.toString(x) + ", " + Integer.toString(y), 24, 40, paint);
 
         invalidate();
         requestLayout();
     }
 
-    private void init() {
+    public void init() {
 
         invalidate();
         requestLayout();
@@ -106,25 +116,6 @@ public class CanvasView extends View {
         activeObj = null;
     }
 
-    public void drawCursor(Canvas canvas) {
-
-        int x = cursor.x - this.x;
-        int y = cursor.y - this.y;
-
-        paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(3);
-
-        canvas.drawLine(x - 48, y, x - 12, y, paint);
-        canvas.drawLine(x + 48, y, x + 12, y, paint);
-        canvas.drawLine(x, y - 12, x, y - 48, paint);
-        canvas.drawLine(x, y + 12, x, y + 48, paint);
-
-        Point center = cursor.target();
-
-        canvas.drawCircle(center.x - this.x, center.y - this.y, 3, paint);
-
-    }
-
     public void update(MotionEvent e, boolean isFinal) {
 
         int x = (int)e.getX();
@@ -135,20 +126,23 @@ public class CanvasView extends View {
         cursor.y = y;
         cursor.off();
 
+        Point p = cursor.clone();
+        p.toCanvasViewCoords();
+
         // determine if cursor is `near` any object
         for (Shape object : objects) {
 
             if (is("moving")) break; // but not if we're moving an object
             if (object == activeObj) break;
 
-            Shape near = object.near(cursor, this.x, this.y);
+            Shape near = object.near(p);
             if (near == null) continue;
 
             cursor.on(near);
         }
 
         // update active object, if it exists
-        if (activeObj != null) activeObj.update(cursor, this.x, this.y, isFinal);
+        if (activeObj != null) activeObj.update(cursor, isFinal);
 
         invalidate();
         requestLayout();
@@ -177,6 +171,11 @@ public class CanvasView extends View {
         }
     }
 
+    public void addObject(Shape s) {
+        s.setCanvasView(this);
+        objects.add(s);
+    }
+
     public boolean createCircle() {
 
         if (this.is("drawing")) return false;
@@ -184,9 +183,10 @@ public class CanvasView extends View {
         this.toggleAction("drawing");
 
         Point pt = cursor.target();
-        Circle c = new Circle(pt.x - x, pt.y - y, 0);
+        if (!cursor.isOn()) pt.toCanvasViewCoords();
+        Circle c = new Circle(pt.x, pt.y, 0);
+        addObject(c);
         activeObj = c;
-        objects.add(c);
 
         return true;
     }
@@ -197,14 +197,14 @@ public class CanvasView extends View {
 
         toggleAction("drawing");
 
-        Point pt = cursor.target();
-        Line line = new Line(
-            pt,
-            new Point(pt.x + x, pt.y + y)
-        );
+        Point p1 = cursor.target();
+        p1.setCanvasView(this);
+        if (!cursor.isOn()) p1.toCanvasViewCoords();
+        Point p2 = p1.clone();
 
+        Line line = new Line(p1, p2);
+        addObject(line);
         activeObj = line;
-        objects.add(line);
 
         return true;
     }
@@ -217,13 +217,16 @@ public class CanvasView extends View {
 
         if (!is("moving") || !cursor.isOn()) return false;
 
+        Point p = cursor.clone();
+        p.toCanvasViewCoords();
+
         for (Shape object : objects) {
-            Shape near = object.near(cursor, x, y);
+            Shape near = object.near(p);
             if (near == null) continue;
             activeObj = near;
         }
 
-        if (activeObj != null) activeObj.update(cursor, x, y, false);
+        if (activeObj != null) activeObj.update(cursor, false);
 
         return true;
     }
@@ -236,8 +239,11 @@ public class CanvasView extends View {
 
         if (!is("moving")) return false;
 
+        Point p = cursor.clone();
+        p.toCanvasViewCoords();
+
         for (Shape object : objects) {
-            Shape near = object.near(cursor, x, y);
+            Shape near = object.near(p);
             if (near == null) continue;
             activeObj = near;
         }
@@ -252,6 +258,7 @@ public class CanvasView extends View {
             cursor.target().y,
             copy
         );
+        genericCopy.setCanvasView(this);
 
         objects.add(copy);
         activeObj = genericCopy;
@@ -265,6 +272,9 @@ public class CanvasView extends View {
 
         List<Shape> remainingObjects = new ArrayList<Shape>();
 
+        Point p = cursor.clone();
+        p.toCanvasViewCoords();
+
         for (Shape object : objects) {
 
             // if it's a point with no lines, remove it
@@ -273,7 +283,7 @@ public class CanvasView extends View {
             }
 
             // if not near the object, keep it
-            if (object.near(cursor, x, y) == null) {
+            if (object.near(p) == null) {
                 remainingObjects.add(object);
             // otherwise, remove it
             } else {
@@ -293,9 +303,12 @@ public class CanvasView extends View {
 
         if (is("moving") || is("drawing")) return false;
 
+        Point p = cursor.clone();
+        p.toCanvasViewCoords();
+
         for (Shape object : objects) {
 
-            Shape near = object.near(cursor, x, y);
+            Shape near = object.near(p);
             if (near == null) continue;
 
             if (near instanceof Generic) { // circle or line
@@ -308,8 +321,8 @@ public class CanvasView extends View {
                     poly.regularize();
                     invalidate();
                     requestLayout();
-                    Log.e("polygon", poly.toString());
-                    Log.e("polygon pts", Integer.toString(poly.points.size()));
+//                    Log.e("polygon", poly.toString());
+//                    Log.e("polygon pts", Integer.toString(poly.points.size()));
                 }
                 // only start seeking from closest point
                 return false;

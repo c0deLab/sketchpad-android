@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
+import cc.scottland.sketchpad.CanvasView;
 import cc.scottland.sketchpad.utils.Utils;
 
 /**
@@ -26,16 +27,17 @@ public class Circle extends Point {
     }
 
     @Override
-    public void update(Cursor c, int x, int y, boolean isFinal) {
-        Point p = new Point(c.x - x, c.y - y);
+    public void update(Cursor c, boolean isFinal) {
+        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
+        Point p = c.clone();
+        p.toCanvasViewCoords();
         this.r = Utils.distance(p, this);
     }
 
     @Override
-    public Shape near(Point pt, int x, int y) {
+    public Shape near(Point pt) {
 
-        pt.x += x;
-        pt.y += y;
+        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
 
         int minDistance = 30;
 
@@ -47,21 +49,26 @@ public class Circle extends Point {
         d.x *= (float)this.r / m;
         d.y *= (float)this.r / m;
 
-        return new Generic(this.x + d.x, this.y + d.y, this);
+        Generic g = new Generic(x + d.x, y + d.y, this);
+        g.setCanvasView(cv);
+        return g;
     }
 
     @Override
-    public void draw(Canvas canvas, int x, int y) {
+    public void draw(Canvas canvas) {
+        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         p.setColor(Color.WHITE);
         p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(3);
-        canvas.drawCircle(this.x + x, this.y + y, r, p);
+        canvas.drawCircle(this.x + cv.x, this.y + cv.y, r, p);
     }
 
     @Override
     public Circle clone() {
-        return new Circle(x, y, r);
+        Circle c = new Circle(x, y, r);
+        c.setCanvasView(cv);
+        return c;
     }
 
     public boolean isTruePoint() { return false; }

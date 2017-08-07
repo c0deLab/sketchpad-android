@@ -10,6 +10,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import cc.scottland.sketchpad.CanvasView;
 import cc.scottland.sketchpad.utils.Utils;
 
 public class Point implements Shape {
@@ -17,6 +18,9 @@ public class Point implements Shape {
     public int x;
     public int y;
     public List<Line> lines = new ArrayList<Line>();
+
+    public CanvasView cv;
+    private Boolean inCanvasViewCoords = false;
 
     public Point() {
         x = 0;
@@ -28,9 +32,25 @@ public class Point implements Shape {
         this.y = y;
     }
 
-    public void update(Cursor c, int x, int y, boolean isFinal) {
-        this.x = c.x + x;
-        this.y = c.y + y;
+    public void setCanvasView(CanvasView cv) {
+        this.cv = cv;
+    }
+
+    public void toCanvasViewCoords() {
+        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
+        if (!inCanvasViewCoords) {
+            inCanvasViewCoords = true;
+            this.x -= cv.x;
+            this.y -= cv.y;
+        }
+    }
+
+    public void update(Cursor c, boolean isFinal) {
+        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
+        Point p = c.clone();
+        p.toCanvasViewCoords();
+        this.x = p.x;
+        this.y = p.y;
     }
 
     public void move(int dx, int dy) {
@@ -45,17 +65,20 @@ public class Point implements Shape {
         while (lines.size() > 0) lines.remove(0);
     }
 
-    public Shape near(Point p, int x, int y) {
-        p.x += x;
-        p.y += y;
+    public Shape near(Point p) {
+        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
+//        p.x += cv.x;
+//        p.y += cv.y;
         return Utils.distance(p, this) < 12 ? this : null;
     }
 
     public Point clone() {
-        return new Point(x, y);
+        Point p = new Point(x, y);
+        p.setCanvasView(cv);
+        return p;
     }
 
-    public void draw(Canvas canvas, int x, int y) { }
+    public void draw(Canvas canvas) { }
 
     public Polygon seek() {
 

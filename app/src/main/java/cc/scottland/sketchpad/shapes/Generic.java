@@ -16,11 +16,14 @@ public class Generic extends Point {
     }
 
     @Override
-    public void update(Cursor c, int x, int y, boolean isFinal) {
+    public void update(Cursor c, boolean isFinal) {
 
-        Point target = c.target();
-        int dx = target.x - this.x + x;
-        int dy = target.y - this.y + y;
+        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
+
+        Point p = c.target();
+        p.toCanvasViewCoords();
+        int dx = p.x - this.x;
+        int dy = p.y - this.y;
 
         original.move(dx, dy);
 

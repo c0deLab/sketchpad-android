@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
+import cc.scottland.sketchpad.CanvasView;
 import cc.scottland.sketchpad.utils.Utils;
 
 /**
@@ -15,6 +16,7 @@ public class Line implements Shape {
 
     public Point p1;
     public Point p2;
+    public CanvasView cv;
 
     public Line(Point p1, Point p2) {
         this.p1 = p1;
@@ -25,12 +27,16 @@ public class Line implements Shape {
         p2.lines.add(this);
     }
 
-    public void update(Cursor c, int x, int y, boolean isFinal) {
+    public void setCanvasView(CanvasView cv) {
+        this.cv = cv;
+    }
 
-        // Point p = new Point(c.x + x, c.y + y);
+    public void update(Cursor c, boolean isFinal) {
+
+        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
 
         if (!isFinal || !c.isOn()) {
-            p2.update(c, x, y, isFinal);
+            p2.update(c, isFinal);
             return;
         }
 
@@ -57,13 +63,13 @@ public class Line implements Shape {
         );
     }
 
-    public Shape near(Point pt, int x, int y) {
+    public Shape near(Point pt) {
 
-        pt.x += x;
-        pt.y += y;
+        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
 
         int minDistance = 30;
 
+        // close to an endpoint
         if (Utils.distance(pt, p1) < minDistance) return p1;
         if (Utils.distance(pt, p2) < minDistance) return p2;
 
@@ -81,25 +87,31 @@ public class Line implements Shape {
 
         int d = Utils.distance(pt, closest);
 
-        if (d < minDistance) return new Generic(closest.x, closest.y, this);
+        if (d < minDistance) {
+            Generic g = new Generic(closest.x, closest.y, this);
+            g.setCanvasView(cv);
+            return g;
+        }
 
         return null;
     }
 
     public Line clone() {
-        return new Line(
-            new Point(p1.x, p1.y),
-            new Point(p2.x, p2.y)
-        );
+        Point p1 = this.p1.clone();
+        Point p2 = this.p2.clone();
+        Line l = new Line(p1, p2);
+        l.setCanvasView(cv);
+        return l;
     }
 
     @Override
-    public void draw(Canvas canvas, int x, int y) {
+    public void draw(Canvas canvas) {
+        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         p.setColor(Color.WHITE);
         p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(3);
-        canvas.drawLine(p1.x + x, p1.y + y, p2.x + x, p2.y + y, p);
+        canvas.drawLine(p1.x + cv.x, p1.y + cv.y, p2.x + cv.x, p2.y + cv.y, p);
     }
 
     public boolean isTruePoint() { return false; }
