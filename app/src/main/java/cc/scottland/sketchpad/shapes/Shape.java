@@ -23,4 +23,6 @@ public interface Shape {
     public void draw(Canvas canvas);
     public void remove();
     public boolean isTruePoint();
+    public void setActive(boolean active);
+    public boolean isActive();
 }

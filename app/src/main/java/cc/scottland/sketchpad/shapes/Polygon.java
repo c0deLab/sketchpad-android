@@ -16,6 +16,7 @@ import cc.scottland.sketchpad.utils.Utils;
 public class Polygon implements Shape {
 
     public List<Point> points = new ArrayList<Point>();
+    private boolean active;
 
     public Polygon() {}
 
@@ -115,4 +116,7 @@ public class Polygon implements Shape {
     }
 
     public boolean isTruePoint() { return false; }
+
+    public void setActive(boolean active) { this.active = active; }
+    public boolean isActive() { return active; }
 }

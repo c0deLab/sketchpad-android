@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import cc.scottland.sketchpad.shapes.Circle;
+import cc.scottland.sketchpad.shapes.Compound;
 import cc.scottland.sketchpad.shapes.Cursor;
 import cc.scottland.sketchpad.shapes.Generic;
 import cc.scottland.sketchpad.shapes.Line;
@@ -41,6 +42,7 @@ public class CanvasView extends View {
     private int bg = Color.BLACK;
 
     private Shape activeObj;
+    private Compound activeCompound;
 
     private Context context;
 
@@ -105,6 +107,10 @@ public class CanvasView extends View {
         update(e, false);
     }
 
+    /**
+     * "Termination flick"
+     * @param e
+     */
     public void onTouchEnd(MotionEvent e) {
         isTouchDown = false;
         cancel(e);
@@ -113,6 +119,9 @@ public class CanvasView extends View {
     public void cancel(MotionEvent e) {
         update(e, true);
         toggleAction("");
+        if (activeObj instanceof Compound) {
+            ((Compound)activeObj).complete();
+        }
         activeObj = null;
     }
 
@@ -166,6 +175,8 @@ public class CanvasView extends View {
                 return deleteObject();
             case KeyEvent.KEYCODE_6:
                 return makeRegular();
+            case KeyEvent.KEYCODE_7:
+                return makeCompound();
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -180,7 +191,7 @@ public class CanvasView extends View {
 
         if (this.is("drawing")) return false;
 
-        this.toggleAction("drawing");
+        toggleAction("drawing");
 
         Point pt = cursor.target();
         if (!cursor.isOn()) pt.toCanvasViewCoords();
@@ -252,6 +263,7 @@ public class CanvasView extends View {
         if (activeObj == null || !(activeObj instanceof Generic)) return false;
 
         Shape copy = ((Generic)activeObj).original.clone();
+        Log.e("made a copy", copy.toString());
 
         Generic genericCopy = new Generic(
             cursor.target().x,
@@ -321,13 +333,56 @@ public class CanvasView extends View {
                     poly.regularize();
                     invalidate();
                     requestLayout();
-//                    Log.e("polygon", poly.toString());
-//                    Log.e("polygon pts", Integer.toString(poly.points.size()));
                 }
                 // only start seeking from closest point
                 return false;
             }
         }
+
+        return true;
+    }
+
+    public boolean makeCompound() {
+
+        if (is("moving") || is("drawing")) return false;
+
+        Point p = cursor.clone();
+        p.toCanvasViewCoords();
+
+        Shape nearest = null;
+
+        for (Shape object : objects) {
+            Shape near = object.near(p);
+            if (near != null) nearest = near;
+        }
+
+        if (nearest == null || nearest.isTruePoint()) return false;
+
+        // guaranteed a generic object now
+        Generic g = (Generic)nearest;
+
+        // if we're just starting, add a new compound
+        if (!is("makingCompound")) {
+
+            Compound c = new Compound(p.x, p.y);
+            c.addShape(g.original);
+            addObject(c);
+
+            activeObj = c;
+
+        } else {
+            ((Compound)activeObj).addShape(g.original);
+        }
+
+        objects.remove(g.original);
+
+        Log.e("compound", activeObj.toString());
+        Log.e("shapes in compound", Integer.toString(((Compound)activeObj).shapes.size()));
+
+        action = "makingCompound";
+
+        invalidate();
+        requestLayout();
 
         return true;
     }

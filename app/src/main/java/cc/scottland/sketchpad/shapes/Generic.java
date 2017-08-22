@@ -20,12 +20,20 @@ public class Generic extends Point {
 
         if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
 
+        // if a compound, just pass the update on through
+        if (original instanceof Compound) {
+            original.update(c, isFinal);
+            return;
+        }
+
         Point p = c.target();
         p.toCanvasViewCoords();
         int dx = p.x - this.x;
         int dy = p.y - this.y;
 
         original.move(dx, dy);
+
+        original.setActive(!isFinal);
 
         x += dx;
         y += dy;

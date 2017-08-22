@@ -2,6 +2,7 @@ package cc.scottland.sketchpad.shapes;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.util.Log;
 
@@ -59,6 +60,12 @@ public class Circle extends Point {
         if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         p.setColor(Color.WHITE);
+
+        if (isActive()) {
+            DashPathEffect dashPath = new DashPathEffect(new float[]{8, 8}, (float) 1.0);
+            p.setPathEffect(dashPath);
+        }
+
         p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(3);
         canvas.drawCircle(this.x + cv.x, this.y + cv.y, r, p);

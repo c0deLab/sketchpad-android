@@ -2,7 +2,9 @@ package cc.scottland.sketchpad.shapes;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.util.Log;
 
 import cc.scottland.sketchpad.CanvasView;
@@ -17,6 +19,8 @@ public class Line implements Shape {
     public Point p1;
     public Point p2;
     public CanvasView cv;
+
+    private boolean active;
 
     public Line(Point p1, Point p2) {
         this.p1 = p1;
@@ -106,13 +110,27 @@ public class Line implements Shape {
 
     @Override
     public void draw(Canvas canvas) {
+
         if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
+
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         p.setColor(Color.WHITE);
+
+        if (isActive()) {
+            DashPathEffect dashPath = new DashPathEffect(new float[]{8, 8}, (float) 1.0);
+            p.setPathEffect(dashPath);
+        }
+
         p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(3);
-        canvas.drawLine(p1.x + cv.x, p1.y + cv.y, p2.x + cv.x, p2.y + cv.y, p);
+        Path path = new Path();
+        path.moveTo(p1.x + cv.x, p1.y + cv.y);
+        path.lineTo(p2.x + cv.x, p2.y + cv.y);
+        canvas.drawPath(path, p);
     }
 
     public boolean isTruePoint() { return false; }
+
+    public void setActive(boolean active) { this.active = active; }
+    public boolean isActive() { return active; }
 }

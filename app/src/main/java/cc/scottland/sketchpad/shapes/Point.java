@@ -20,7 +20,8 @@ public class Point implements Shape {
     public List<Line> lines = new ArrayList<Line>();
 
     public CanvasView cv;
-    private Boolean inCanvasViewCoords = false;
+    private boolean inCanvasViewCoords = false;
+    private boolean active = false;
 
     public Point() {
         x = 0;
@@ -116,4 +117,7 @@ public class Point implements Shape {
     }
 
     public boolean isTruePoint() { return true; }
+
+    public void setActive(boolean active) { this.active = active; }
+    public boolean isActive() { return active; }
 }
