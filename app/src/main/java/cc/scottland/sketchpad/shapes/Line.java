@@ -133,4 +133,14 @@ public class Line implements Shape {
 
     public void setActive(boolean active) { this.active = active; }
     public boolean isActive() { return active; }
+
+    public void rotate(double angle, Point ref) {
+        p1.rotate(angle, ref);
+        p2.rotate(angle, ref);
+    }
+
+    public void scale(double factor, Point ref) {
+        p1.scale(factor, ref);
+        p2.scale(factor, ref);
+    }
 }

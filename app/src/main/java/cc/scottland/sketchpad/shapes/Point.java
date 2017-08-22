@@ -68,8 +68,6 @@ public class Point implements Shape {
 
     public Shape near(Point p) {
         if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
-//        p.x += cv.x;
-//        p.y += cv.y;
         return Utils.distance(p, this) < 12 ? this : null;
     }
 
@@ -120,4 +118,33 @@ public class Point implements Shape {
 
     public void setActive(boolean active) { this.active = active; }
     public boolean isActive() { return active; }
+
+    public void rotate(double angle, Point ref) {
+
+        x -= ref.x;
+        y -= ref.y;
+
+        double s = Math.sin(angle);
+        double c = Math.cos(angle);
+
+        int xnew = (int)(x * c - y * s);
+        int ynew = (int)(x * s + y * c);
+
+        x = xnew;
+        y = ynew;
+
+        x += ref.x;
+        y += ref.y;
+    }
+
+    public void scale(double factor, Point ref) {
+        x -= ref.x;
+        y -= ref.y;
+
+        x = (int)(x * factor);
+        y = (int)(y * factor);
+
+        x += ref.x;
+        y += ref.y;
+    }
 }

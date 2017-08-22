@@ -79,4 +79,9 @@ public class Circle extends Point {
     }
 
     public boolean isTruePoint() { return false; }
+
+    public void scale(double factor, Point ref) {
+        super.scale(factor, ref);
+        r = (int)(r * factor);
+    }
 }

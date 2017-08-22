@@ -64,7 +64,6 @@ public class Compound extends Point {
         return null;
     }
 
-    // TODO
     public void update(Cursor c, boolean isFinal) {
 
         if (!isComplete) return;
@@ -113,6 +112,14 @@ public class Compound extends Point {
 
     public void remove() {
         for (Shape shape : shapes) shape.remove();
+    }
+
+    public void rotate(double angle, Point ref) {
+        for (Point point : points) point.rotate(angle, ref);
+    }
+
+    public void scale(double factor, Point ref) {
+        for (Point point : points) point.scale(factor, ref);
     }
 
     public void complete() { isComplete = true; }

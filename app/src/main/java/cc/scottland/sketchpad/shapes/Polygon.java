@@ -119,4 +119,8 @@ public class Polygon implements Shape {
 
     public void setActive(boolean active) { this.active = active; }
     public boolean isActive() { return active; }
+
+    // TODO ? maybe it's ok that these are noops
+    public void rotate(double angle, Point ref) {}
+    public void scale(double factor, Point ref) {}
 }

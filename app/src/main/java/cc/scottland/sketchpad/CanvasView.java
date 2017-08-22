@@ -151,7 +151,13 @@ public class CanvasView extends View {
         }
 
         // update active object, if it exists
-        if (activeObj != null) activeObj.update(cursor, isFinal);
+        if (activeObj != null) {
+            if (is("rotating")) {
+
+            } else {
+                activeObj.update(cursor, isFinal);
+            }
+        }
 
         invalidate();
         requestLayout();
@@ -177,6 +183,10 @@ public class CanvasView extends View {
                 return makeRegular();
             case KeyEvent.KEYCODE_7:
                 return makeCompound();
+            case KeyEvent.KEYCODE_8:
+                return rotate();
+            case KeyEvent.KEYCODE_9:
+                return scale();
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -383,6 +393,43 @@ public class CanvasView extends View {
 
         invalidate();
         requestLayout();
+
+        return true;
+    }
+
+    // TODO: how to pass this to MainActivity so control knobs can do it?
+    public boolean rotate() {
+
+        if (is("moving") || is("drawing")) return false;
+
+        Point p = cursor.clone();
+        p.toCanvasViewCoords();
+
+        Shape nearest = null;
+
+        for (Shape object : objects) {
+            if (object.near(p) != null) {
+                object.rotate(0.1, cursor.target());
+            }
+        }
+
+        return true;
+    }
+
+    public boolean scale() {
+
+        if (is("moving") || is("drawing")) return false;
+
+        Point p = cursor.clone();
+        p.toCanvasViewCoords();
+
+        Shape nearest = null;
+
+        for (Shape object : objects) {
+            if (object.near(p) != null) {
+                object.scale(0.9, cursor.target());
+            }
+        }
 
         return true;
     }
