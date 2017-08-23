@@ -184,9 +184,11 @@ public class CanvasView extends View {
             case KeyEvent.KEYCODE_7:
                 return makeCompound();
             case KeyEvent.KEYCODE_8:
-                return rotate();
+                action = "rotating";
+                return true;
             case KeyEvent.KEYCODE_9:
-                return scale();
+                action = "scaling";
+                return true;
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -195,6 +197,17 @@ public class CanvasView extends View {
     public void addObject(Shape s) {
         s.setCanvasView(this);
         objects.add(s);
+    }
+
+    public void knob(int which, int val) {
+        // which = 1: knob one, = 2: knob two
+        if (is("rotating")) {
+            rotate(val);
+        } else if (is("scaling")) {
+            scale(val);
+        } else {
+
+        }
     }
 
     public boolean createCircle() {
@@ -397,8 +410,7 @@ public class CanvasView extends View {
         return true;
     }
 
-    // TODO: how to pass this to MainActivity so control knobs can do it?
-    public boolean rotate() {
+    public boolean rotate(int angle) {
 
         if (is("moving") || is("drawing")) return false;
 
@@ -409,16 +421,20 @@ public class CanvasView extends View {
 
         for (Shape object : objects) {
             if (object.near(p) != null) {
-                object.rotate(0.1, cursor.target());
+                object.rotate((double)angle * 0.05, cursor.target());
             }
         }
 
         return true;
     }
 
-    public boolean scale() {
+    public boolean scale(int val) {
 
         if (is("moving") || is("drawing")) return false;
+
+        // val starts as either -1 or 1
+        val *= 0.05;    // now -0.05 or 0.05
+        val += 1;       // now 0.95 or 1.05
 
         Point p = cursor.clone();
         p.toCanvasViewCoords();
@@ -427,7 +443,7 @@ public class CanvasView extends View {
 
         for (Shape object : objects) {
             if (object.near(p) != null) {
-                object.scale(0.9, cursor.target());
+                object.scale(val, cursor.target());
             }
         }
 

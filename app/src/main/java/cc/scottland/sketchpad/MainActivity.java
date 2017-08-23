@@ -111,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
 
                             if (controlOneConnection.requestWait() == requestOne) {
                                 char result = bufferOne.getChar(0);
-                                cv.x += result == 1 ? 6 : result == 255 ? -6 : 0;
+                                // cv.x += result == 1 ? 6 : result == 255 ? -6 : 0;
+                                cv.knob(1, result == 1 ? 1 : -1);
                             }
 
                             runOnUiThread (new Thread(new Runnable() {
@@ -143,12 +144,13 @@ public class MainActivity extends AppCompatActivity {
 
                             if (controlTwoConnection.requestWait() == requestTwo) {
                                 char result = bufferTwo.getChar(0);
-                                cv.y += result == 1 ? 6 : result == 255 ? -6 : 0;
+                                // cv.y += result == 1 ? 6 : result == 255 ? -6 : 0;
+                                cv.knob(2, result == 1 ? 1 : -1);
                             }
 
                             runOnUiThread (new Thread(new Runnable() {
                                 public void run() {
-                                    cv.init();
+                                cv.init();
                                 }
                             }));
                         }
