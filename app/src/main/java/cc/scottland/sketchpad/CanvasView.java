@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.util.List;
 import java.util.ArrayList;
 
+import cc.scottland.sketchpad.shapes.Arc;
 import cc.scottland.sketchpad.shapes.Circle;
 import cc.scottland.sketchpad.shapes.Compound;
 import cc.scottland.sketchpad.shapes.Cursor;
@@ -22,6 +23,7 @@ import cc.scottland.sketchpad.shapes.Line;
 import cc.scottland.sketchpad.shapes.Point;
 import cc.scottland.sketchpad.shapes.Polygon;
 import cc.scottland.sketchpad.shapes.Shape;
+import cc.scottland.sketchpad.utils.Utils;
 
 /**
  * Created by scottdonaldson on 7/12/17.
@@ -177,6 +179,8 @@ public class CanvasView extends View {
                 return makeRegular();
             case KeyEvent.KEYCODE_7:
                 return makeCompound();
+            case KeyEvent.KEYCODE_8:
+                return createArc();
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -235,6 +239,36 @@ public class CanvasView extends View {
         Circle c = new Circle(pt.x, pt.y, 0);
         addObject(c);
         activeObj = c;
+
+        return true;
+    }
+
+    public boolean createArc() {
+
+        // if (this.is("drawing")) return false;
+
+        // toggleAction("drawing");
+        action = "drawing";
+
+        Point pt = cursor.target();
+        if (!cursor.isOn()) pt.toCanvasViewCoords();
+
+        if (activeObj instanceof Arc) {
+
+            Arc a = (Arc)activeObj;
+
+            if (!a.hasRadius && !a.hasStart) {
+                a.setRadius( (int) Utils.distance(a, pt) );
+                a.setStart( (float) Utils.angle(a, pt) );
+            }
+
+            return true;
+        }
+
+        Arc a = new Arc(pt.x, pt.y, 0);
+
+        addObject(a);
+        activeObj = a;
 
         return true;
     }

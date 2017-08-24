@@ -8,6 +8,9 @@ import cc.scottland.sketchpad.shapes.Point;
 
 public class Utils {
 
+    public static final int DEGREES = 1;
+    public static final int RADIANS = 2;
+
     public static float distance(Point p1, Point p2) {
 
         float dx = p1.x - p2.x;
@@ -24,5 +27,17 @@ public class Utils {
     public static double angle(Point p1, Point p2) {
 
         return Math.toDegrees(Math.atan2(p2.y - p1.y, p2.x - p1.x));
+    }
+
+    public static double angle(Point p1, Point p2, int type) {
+
+        if (type == DEGREES) {
+            return angle(p1, p2);
+        } else if (type == RADIANS) {
+            return Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        }
+
+        throw new Error("Type must be either Utils.DEGREES or Utils.RADIANS");
+
     }
 }
