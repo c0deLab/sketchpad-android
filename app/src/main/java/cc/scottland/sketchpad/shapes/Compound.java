@@ -1,6 +1,7 @@
 package cc.scottland.sketchpad.shapes;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -82,10 +83,10 @@ public class Compound extends Point {
         super.update(c, isFinal);
     }
 
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas, Paint p) {
         for (Shape shape : shapes) {
             shape.setActive(!isComplete);
-            shape.draw(canvas);
+            shape.draw(canvas, p);
         }
     }
 

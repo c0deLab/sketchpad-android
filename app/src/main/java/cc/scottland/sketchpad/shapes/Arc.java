@@ -104,9 +104,10 @@ public class Arc extends Circle {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas, Paint p) {
+
         if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
-        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+
         p.setColor(Color.WHITE);
 
         p.setStyle(Paint.Style.STROKE);

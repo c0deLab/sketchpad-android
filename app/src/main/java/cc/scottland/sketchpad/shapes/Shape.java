@@ -1,6 +1,7 @@
 package cc.scottland.sketchpad.shapes;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 
 import cc.scottland.sketchpad.CanvasView;
 
@@ -20,7 +21,7 @@ public interface Shape {
      */
     public Shape near(Point p);
     public Shape clone();
-    public void draw(Canvas canvas);
+    public void draw(Canvas canvas, Paint p);
     public void remove();
     public boolean isTruePoint();
     public void setActive(boolean active);

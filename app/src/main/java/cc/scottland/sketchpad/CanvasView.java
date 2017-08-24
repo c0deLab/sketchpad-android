@@ -44,7 +44,6 @@ public class CanvasView extends View {
     private int bg = Color.BLACK;
 
     private Shape activeObj;
-    private Compound activeCompound;
 
     private Context context;
 
@@ -66,14 +65,16 @@ public class CanvasView extends View {
         super.onDraw(canvas);
 
         paint.setColor(bg);
+        paint.setStyle(Paint.Style.FILL);
         canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
 
-        if (isTouchDown) cursor.draw(canvas);
+        if (isTouchDown) cursor.draw(canvas, paint);
 
-        for (Shape object : objects) object.draw(canvas);
+        for (Shape object : objects) object.draw(canvas, paint);
 
         paint.setColor(Color.WHITE);
         paint.setTextSize(24);
+        paint.setStyle(Paint.Style.FILL);
         canvas.drawText(action.toUpperCase(), 24, 40, paint);
 
         invalidate();

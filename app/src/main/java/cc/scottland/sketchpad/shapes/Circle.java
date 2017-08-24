@@ -57,14 +57,17 @@ public class Circle extends Point {
     }
 
     @Override
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas, Paint p) {
+
         if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
-        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+
         p.setColor(Color.WHITE);
 
         if (isActive()) {
             DashPathEffect dashPath = new DashPathEffect(new float[]{8, 8}, (float) 1.0);
             p.setPathEffect(dashPath);
+        } else {
+            p.setPathEffect(null);
         }
 
         p.setStyle(Paint.Style.STROKE);

@@ -39,23 +39,21 @@ public class Cursor extends Point {
 
     public boolean isTruePoint() { return false; }
 
-    public void draw(Canvas canvas) {
+    public void draw(Canvas canvas, Paint p) {
 
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setColor(Color.WHITE);
+        p.setStrokeWidth(3);
 
-        paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(3);
-
-        canvas.drawLine(x - 48, y, x - 12, y, paint);
-        canvas.drawLine(x + 48, y, x + 12, y, paint);
-        canvas.drawLine(x, y - 12, x, y - 48, paint);
-        canvas.drawLine(x, y + 12, x, y + 48, paint);
+        canvas.drawLine(x - 48, y, x - 12, y, p);
+        canvas.drawLine(x + 48, y, x + 12, y, p);
+        canvas.drawLine(x, y - 12, x, y - 48, p);
+        canvas.drawLine(x, y + 12, x, y + 48, p);
 
         canvas.drawCircle(
             isOn() ? (target().x + cv.x) : x,
             isOn() ? (target().y + cv.y) : y,
             3,
-            paint
+            p
         );
     }
 

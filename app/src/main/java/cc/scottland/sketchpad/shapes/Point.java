@@ -5,6 +5,7 @@ package cc.scottland.sketchpad.shapes;
  */
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -82,7 +83,7 @@ public class Point implements Shape {
         return p;
     }
 
-    public void draw(Canvas canvas) { }
+    public void draw(Canvas canvas, Paint p) { }
 
     public Polygon seek() {
 
