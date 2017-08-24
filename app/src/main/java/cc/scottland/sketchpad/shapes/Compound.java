@@ -19,7 +19,7 @@ public class Compound extends Point {
     private boolean isComplete = false;
     private boolean active;
 
-    public Compound(int x, int y) {
+    public Compound(float x, float y) {
         super(x, y);
     }
 
@@ -37,6 +37,7 @@ public class Compound extends Point {
     }
 
     public void move(int dx, int dy) {
+
         for (Shape shape : shapes) shape.move(dx, dx);
     }
 
@@ -71,8 +72,8 @@ public class Compound extends Point {
         Point p = c.target();
         p.toCanvasViewCoords();
 
-        int dx = p.x - this.x;
-        int dy = p.y - this.y;
+        int dx = (int)(p.x - this.x);
+        int dy = (int)(p.y - this.y);
 
         for (Shape shape : shapes) shape.setActive(!isFinal);
 
@@ -114,11 +115,11 @@ public class Compound extends Point {
         for (Shape shape : shapes) shape.remove();
     }
 
-    public void rotate(double angle, Point ref) {
+    public void rotate(float angle, Point ref) {
         for (Point point : points) point.rotate(angle, ref);
     }
 
-    public void scale(double factor, Point ref) {
+    public void scale(float factor, Point ref) {
         for (Point point : points) point.scale(factor, ref);
     }
 

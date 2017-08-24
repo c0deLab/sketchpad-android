@@ -60,7 +60,7 @@ public class Polygon implements Shape {
 
     public boolean isRegular() {
 
-        int d = 0;
+        float d = 0;
 
         for (int i = 0; i < points.size(); i++) {
             Point a = points.get(i);
@@ -102,7 +102,7 @@ public class Polygon implements Shape {
         Point c = center();
         Point p = points.get(0);
         double angle = Utils.angle(c, p);
-        int distance = Utils.distance(c, p);
+        float distance = Utils.distance(c, p);
 
         for (int i = 1; i < points.size(); i++) {
 
@@ -121,6 +121,6 @@ public class Polygon implements Shape {
     public boolean isActive() { return active; }
 
     // TODO ? maybe it's ok that these are noops
-    public void rotate(double angle, Point ref) {}
-    public void scale(double factor, Point ref) {}
+    public void rotate(float angle, Point ref) {}
+    public void scale(float factor, Point ref) {}
 }

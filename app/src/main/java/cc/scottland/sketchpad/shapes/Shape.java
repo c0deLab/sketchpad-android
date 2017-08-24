@@ -25,6 +25,6 @@ public interface Shape {
     public boolean isTruePoint();
     public void setActive(boolean active);
     public boolean isActive();
-    public void rotate(double angle, Point ref);
-    public void scale(double factor, Point ref);
+    public void rotate(float angle, Point ref);
+    public void scale(float factor, Point ref);
 }

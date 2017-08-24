@@ -10,7 +10,7 @@ public class Generic extends Point {
 
     public Shape original;
 
-    public Generic(int x, int y, Shape original) {
+    public Generic(float x, float y, Shape original) {
         super(x, y);
         this.original = original;
     }
@@ -28,10 +28,10 @@ public class Generic extends Point {
 
         Point p = c.target();
         p.toCanvasViewCoords();
-        int dx = p.x - this.x;
-        int dy = p.y - this.y;
+        float dx = p.x - this.x;
+        float dy = p.y - this.y;
 
-        original.move(dx, dy);
+        original.move((int)dx, (int)dy);
 
         original.setActive(!isFinal);
 

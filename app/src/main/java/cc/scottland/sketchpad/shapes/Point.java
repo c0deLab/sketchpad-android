@@ -15,8 +15,8 @@ import cc.scottland.sketchpad.utils.Utils;
 
 public class Point implements Shape {
 
-    public int x;
-    public int y;
+    public float x;
+    public float y;
     public List<Line> lines = new ArrayList<Line>();
 
     public CanvasView cv;
@@ -28,7 +28,7 @@ public class Point implements Shape {
         y = 0;
     }
 
-    public Point(int x, int y) {
+    public Point(float x, float y) {
         this.x = x;
         this.y = y;
     }
@@ -47,9 +47,14 @@ public class Point implements Shape {
     }
 
     public void update(Cursor c, boolean isFinal) {
+
         if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
+
         Point p = c.clone();
         p.toCanvasViewCoords();
+
+        for (Line line : lines) line.setActive(!isFinal);
+
         this.x = p.x;
         this.y = p.y;
     }
@@ -116,19 +121,22 @@ public class Point implements Shape {
 
     public boolean isTruePoint() { return true; }
 
-    public void setActive(boolean active) { this.active = active; }
+    public void setActive(boolean active) {
+        for (Line line : lines) line.setActive(active);
+        this.active = active;
+    }
     public boolean isActive() { return active; }
 
-    public void rotate(double angle, Point ref) {
+    public void rotate(float angle, Point ref) {
 
         x -= ref.x;
         y -= ref.y;
 
-        double s = Math.sin(angle);
-        double c = Math.cos(angle);
+        float s = (float)Math.sin(angle);
+        float c = (float)Math.cos(angle);
 
-        int xnew = (int)(x * c - y * s);
-        int ynew = (int)(x * s + y * c);
+        float xnew = x * c - y * s;
+        float ynew = x * s + y * c;
 
         x = xnew;
         y = ynew;
@@ -137,12 +145,12 @@ public class Point implements Shape {
         y += ref.y;
     }
 
-    public void scale(double factor, Point ref) {
+    public void scale(float factor, Point ref) {
         x -= ref.x;
         y -= ref.y;
 
-        x = (int)(x * factor);
-        y = (int)(y * factor);
+        x = x * factor;
+        y = y * factor;
 
         x += ref.x;
         y += ref.y;

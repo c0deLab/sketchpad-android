@@ -105,19 +105,15 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     while (true) {
-                        ByteBuffer bufferOne = ByteBuffer.allocate(size);
 
-                        if (requestOne.queue(bufferOne, size) == true) {
+                        final ByteBuffer bufferOne = ByteBuffer.allocate(size);
 
-                            if (controlOneConnection.requestWait() == requestOne) {
-                                char result = bufferOne.getChar(0);
-                                // cv.x += result == 1 ? 6 : result == 255 ? -6 : 0;
-                                cv.knob(1, result == 1 ? 1 : -1);
-                            }
+                        if (requestOne.queue(bufferOne, size) == true && controlOneConnection.requestWait() == requestOne) {
 
                             runOnUiThread (new Thread(new Runnable() {
                                 public void run() {
-                                    cv.init();
+                                    char result = bufferOne.getChar(0);
+                                    cv.knob(1, result == 1 ? 1 : -1);
                                 }
                             }));
                         }
@@ -138,19 +134,15 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     while (true) {
-                        ByteBuffer bufferTwo = ByteBuffer.allocate(size);
 
-                        if (requestTwo.queue(bufferTwo, size) == true) {
+                        final ByteBuffer bufferTwo = ByteBuffer.allocate(size);
 
-                            if (controlTwoConnection.requestWait() == requestTwo) {
-                                char result = bufferTwo.getChar(0);
-                                // cv.y += result == 1 ? 6 : result == 255 ? -6 : 0;
-                                cv.knob(2, result == 1 ? 1 : -1);
-                            }
+                        if (requestTwo.queue(bufferTwo, size) == true && controlTwoConnection.requestWait() == requestTwo) {
 
                             runOnUiThread (new Thread(new Runnable() {
                                 public void run() {
-                                cv.init();
+                                    char result = bufferTwo.getChar(0);
+                                    cv.knob(2, result == 1 ? 1 : -1);
                                 }
                             }));
                         }

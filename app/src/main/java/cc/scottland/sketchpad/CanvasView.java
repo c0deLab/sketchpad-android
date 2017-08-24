@@ -72,7 +72,7 @@ public class CanvasView extends View {
 
         paint.setColor(Color.WHITE);
         paint.setTextSize(24);
-        canvas.drawText(Integer.toString(x) + ", " + Integer.toString(y), 24, 40, paint);
+        canvas.drawText(action.toUpperCase(), 24, 40, paint);
 
         invalidate();
         requestLayout();
@@ -127,8 +127,8 @@ public class CanvasView extends View {
 
     public void update(MotionEvent e, boolean isFinal) {
 
-        int x = (int)e.getX();
-        int y = (int)e.getY();
+        int x = (int)e.getRawX();
+        int y = (int)e.getRawY();
 
         // update cursor
         cursor.x = x;
@@ -151,13 +151,7 @@ public class CanvasView extends View {
         }
 
         // update active object, if it exists
-        if (activeObj != null) {
-            if (is("rotating")) {
-
-            } else {
-                activeObj.update(cursor, isFinal);
-            }
-        }
+        if (activeObj != null) activeObj.update(cursor, isFinal);
 
         invalidate();
         requestLayout();
@@ -183,12 +177,6 @@ public class CanvasView extends View {
                 return makeRegular();
             case KeyEvent.KEYCODE_7:
                 return makeCompound();
-            case KeyEvent.KEYCODE_8:
-                action = "rotating";
-                return true;
-            case KeyEvent.KEYCODE_9:
-                action = "scaling";
-                return true;
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -200,14 +188,40 @@ public class CanvasView extends View {
     }
 
     public void knob(int which, int val) {
-        // which = 1: knob one, = 2: knob two
-        if (is("rotating")) {
-            rotate(val);
-        } else if (is("scaling")) {
-            scale(val);
-        } else {
 
+        // which = 1: knob one, = 2: knob two
+        // Log.e("control knob", Integer.toString(which) + " at " + Integer.toString(val));
+
+        Point p = cursor.clone();
+        p.toCanvasViewCoords();
+
+        // find nearest object
+        Shape nearest = null;
+        for (Shape object : objects) {
+            Shape near = object.near(p);
+            if (near != null) nearest = near;
         }
+
+        if (nearest == null || nearest.isTruePoint()) return;
+
+        // nearest must be generic
+        Generic g = (Generic)nearest;
+
+        if (which == 1) {
+            action = "rotating";
+            g.original.rotate((float)val * 0.05f, cursor.target());
+        } else if (which == 2) {
+            // val starts as either -1 or 1
+            action = "scaling";
+            float factor = (float)val;
+            factor *= 0.05;    // now -0.05 or 0.05
+            factor += 1;       // now 0.95 or 1.05
+            g.original.scale(factor, cursor.target());
+        } else {
+            // TODO
+        }
+
+        invalidate();
     }
 
     public boolean createCircle() {
@@ -286,7 +300,6 @@ public class CanvasView extends View {
         if (activeObj == null || !(activeObj instanceof Generic)) return false;
 
         Shape copy = ((Generic)activeObj).original.clone();
-        Log.e("made a copy", copy.toString());
 
         Generic genericCopy = new Generic(
             cursor.target().x,
@@ -385,7 +398,7 @@ public class CanvasView extends View {
         Generic g = (Generic)nearest;
 
         // if we're just starting, add a new compound
-        if (!is("makingCompound")) {
+        if (!is("making compound")) {
 
             Compound c = new Compound(p.x, p.y);
             c.addShape(g.original);
@@ -399,53 +412,10 @@ public class CanvasView extends View {
 
         objects.remove(g.original);
 
-        Log.e("compound", activeObj.toString());
-        Log.e("shapes in compound", Integer.toString(((Compound)activeObj).shapes.size()));
-
-        action = "makingCompound";
+        action = "making compound";
 
         invalidate();
         requestLayout();
-
-        return true;
-    }
-
-    public boolean rotate(int angle) {
-
-        if (is("moving") || is("drawing")) return false;
-
-        Point p = cursor.clone();
-        p.toCanvasViewCoords();
-
-        Shape nearest = null;
-
-        for (Shape object : objects) {
-            if (object.near(p) != null) {
-                object.rotate((double)angle * 0.05, cursor.target());
-            }
-        }
-
-        return true;
-    }
-
-    public boolean scale(int val) {
-
-        if (is("moving") || is("drawing")) return false;
-
-        // val starts as either -1 or 1
-        val *= 0.05;    // now -0.05 or 0.05
-        val += 1;       // now 0.95 or 1.05
-
-        Point p = cursor.clone();
-        p.toCanvasViewCoords();
-
-        Shape nearest = null;
-
-        for (Shape object : objects) {
-            if (object.near(p) != null) {
-                object.scale(val, cursor.target());
-            }
-        }
 
         return true;
     }

@@ -17,12 +17,12 @@ public class Circle extends Point {
 
     public int r;
 
-    public Circle(int x, int y) {
+    public Circle(float x, float y) {
         super(x, y);
         this.r = 0;
     }
 
-    public Circle(int x, int y, int r) {
+    public Circle(float x, float y, int r) {
         super(x, y);
         this.r = r;
     }
@@ -32,7 +32,8 @@ public class Circle extends Point {
         if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
         Point p = c.clone();
         p.toCanvasViewCoords();
-        this.r = Utils.distance(p, this);
+        setActive(!isFinal);
+        this.r = (int)Utils.distance(p, this);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class Circle extends Point {
         if (Math.abs(Utils.distance(pt, this) - this.r) > minDistance) return null;
 
         Point d = new Point(pt.x - this.x, pt.y - this.y);
-        int m = Utils.distance(d, new Point());
+        float m = Utils.distance(d, new Point());
         d.x *= (float)this.r / m;
         d.y *= (float)this.r / m;
 
@@ -80,7 +81,7 @@ public class Circle extends Point {
 
     public boolean isTruePoint() { return false; }
 
-    public void scale(double factor, Point ref) {
+    public void scale(float factor, Point ref) {
         super.scale(factor, ref);
         r = (int)(r * factor);
     }
