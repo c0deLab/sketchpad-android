@@ -15,14 +15,14 @@ import cc.scottland.sketchpad.utils.Utils;
 
 public class Circle extends Point {
 
-    public int r;
+    public float r;
 
     public Circle(float x, float y) {
         super(x, y);
         this.r = 0;
     }
 
-    public Circle(float x, float y, int r) {
+    public Circle(float x, float y, float r) {
         super(x, y);
         this.r = r;
     }
@@ -86,6 +86,6 @@ public class Circle extends Point {
 
     public void scale(float factor, Point ref) {
         super.scale(factor, ref);
-        r = (int)(r * factor);
+        r *= factor;
     }
 }

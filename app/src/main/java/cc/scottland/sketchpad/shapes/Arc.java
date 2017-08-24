@@ -16,8 +16,8 @@ import cc.scottland.sketchpad.utils.Utils;
 public class Arc extends Circle {
 
     // two angles, in degrees
-    float start;
-    float end;
+    float start; // -180 <= start < 180
+    float end; // -180 < end <= 180
 
     public boolean hasRadius = false;
     public boolean hasStart = false;
@@ -30,28 +30,28 @@ public class Arc extends Circle {
         super(x, y);
     }
 
-    public Arc(float x, float y, int r) {
+    public Arc(float x, float y, float r) {
         super(x, y, r);
     }
 
-    public Arc(float x, float y, int r, float start, float end) {
+    public Arc(float x, float y, float r, float start, float end) {
         super(x, y, r);
         this.start = start;
         this.end = end;
     }
 
-    public void setRadius(int r) {
+    public void setRadius(float r) {
         this.r = r;
         this.hasRadius = true;
     }
 
     public void setStart(float start) {
-        this.start = start;
+        this.start = Utils.nonNegativeDegree(start);
         hasStart = true;
     }
 
     public void setEnd(float end) {
-        this.end = end;
+        this.end = Utils.nonNegativeDegree(end);
         hasEnd = true;
     }
 
@@ -67,11 +67,13 @@ public class Arc extends Circle {
 
         if (!hasRadius && !hasStart) {
 
-            this.r = (int) Utils.distance(this, p);
-            this.start = (float) Utils.angle(this, p);
+            this.r = Utils.distance(this, c.target());
+            this.start = (float) Utils.angle(this, c.target());
+            this.start = Utils.nonNegativeDegree(this.start);
 
         } else if (!hasEnd) {
-            this.end = (float) Utils.angle(this, p);
+            this.end = (float) Utils.angle(this, c.target());
+            this.end = Utils.nonNegativeDegree(this.end);
         }
     }
 
@@ -84,9 +86,17 @@ public class Arc extends Circle {
 
         // not in the right piece of pie
         double angle = Utils.angle(this, pt);
+        angle = Utils.nonNegativeDegree(angle);
+
+        // near an endpoint
+        if (startPoint().near(pt) != null) return startPoint();
+        if (endPoint().near(pt) != null) return endPoint();
 
         float a = start > end ? end : start;
         float b = start > end ? start : end;
+//        Log.e("angle", Double.toString(angle));
+//        Log.e("a", Double.toString(a));
+//        Log.e("b", Double.toString(b));
 
         if (angle < a || angle > b) return null;
 
@@ -131,6 +141,8 @@ public class Arc extends Circle {
             if (isActive()) {
                 DashPathEffect dashPath = new DashPathEffect(new float[]{8, 8}, (float) 1.0);
                 p.setPathEffect(dashPath);
+            } else {
+                p.setPathEffect(null);
             }
 
             // line from radius to start
@@ -142,7 +154,7 @@ public class Arc extends Circle {
             path.lineTo(x + sx, y + sy);
             if (!hasRadius && !hasStart) canvas.drawPath(path, p);
 
-            if (!hasStart) return;
+            if (!hasStart || start == end) return;
 
             // arc from start to (temp) end
             canvas.drawArc(
@@ -166,5 +178,30 @@ public class Arc extends Circle {
         a.setStart(start);
         a.setEnd(end);
         return a;
+    }
+
+    public Point startPoint() {
+        float sx = (float)(r * Math.cos(Math.toRadians(start)));
+        float sy = (float)(r * Math.sin(Math.toRadians(start)));
+        Point p = new Point(x + sx, y + sy);
+        p.setCanvasView(cv);
+        return p;
+    }
+
+    public Point endPoint() {
+        float sx = (float)(r * Math.cos(Math.toRadians(end)));
+        float sy = (float)(r * Math.sin(Math.toRadians(end)));
+        Point p = new Point(x + sx, y + sy);
+        p.setCanvasView(cv);
+        return p;
+    }
+
+    @Override
+    public void rotate(float angle, Point ref) {
+        super.rotate(angle, ref);
+        start += Math.toDegrees(angle);
+        start = Utils.nonNegativeDegree(start);
+        end += Math.toDegrees(angle);
+        end = Utils.nonNegativeDegree(end);
     }
 }

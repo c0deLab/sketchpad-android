@@ -24,7 +24,6 @@ public class Compound extends Point {
         super(x, y);
     }
 
-    // TODO
     public Compound clone() {
 
         Compound c = new Compound(x, y);

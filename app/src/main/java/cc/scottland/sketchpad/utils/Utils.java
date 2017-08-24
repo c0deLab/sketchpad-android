@@ -40,4 +40,19 @@ public class Utils {
         throw new Error("Type must be either Utils.DEGREES or Utils.RADIANS");
 
     }
+
+    public static double nonNegativeDegree(double n) {
+        while (n < 0) n += 360;
+        return n;
+    }
+
+    public static float nonNegativeDegree(float n) {
+        while (n < 0) n += 360;
+        return n;
+    }
+
+    public static int nonNegativeDegree(int n) {
+        while (n < 0) n += 360;
+        return n;
+    }
 }
