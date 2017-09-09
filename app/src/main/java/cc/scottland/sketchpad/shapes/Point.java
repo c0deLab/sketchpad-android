@@ -38,8 +38,21 @@ public class Point implements Shape {
 
         for (Line line : lines) line.setActive(!isFinal);
 
-        this.x = p.x;
-        this.y = p.y;
+        // we might want to *overwrite* this point with another,
+        // as when moving the endpoint of a line to another point
+        if (isFinal) {
+            for (Shape shape : c.over()) {
+                if (!shape.isTruePoint()) return;
+                Point pt = (Point)shape;
+                for (Line line : lines) {
+                    if (this == line.p1) line.setP1(pt);
+                    if (this == line.p2) line.setP2(pt);
+                }
+            }
+        } else {
+            this.x = p.x;
+            this.y = p.y;
+        }
     }
 
     public void move(int dx, int dy) {

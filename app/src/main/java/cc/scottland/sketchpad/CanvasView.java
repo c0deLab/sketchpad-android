@@ -32,7 +32,7 @@ import cc.scottland.sketchpad.utils.Utils;
 public class CanvasView extends View {
 
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private List<Shape> objects = new ArrayList<Shape>();
+    public List<Shape> objects = new ArrayList<Shape>();
 
     private boolean isTouchDown = false;
     private Cursor cursor = new Cursor();
@@ -50,12 +50,14 @@ public class CanvasView extends View {
     public CanvasView(Context context) {
         super(context);
         this.context = context;
+        cursor.setCanvasView(this);
         init();
     }
 
     public CanvasView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
+        cursor.setCanvasView(this);
         init();
     }
 
@@ -403,16 +405,26 @@ public class CanvasView extends View {
             if (near == null) continue;
 
             if (near instanceof Generic) { // circle or line
-                Log.e("near generic", near.toString());
+
+                Generic g = (Generic)near;
+                if (g.original instanceof Circle) return false;
+
+                Polygon poly = ((Line)(g.original)).p1.seek();
+                if (poly == null) return false;
+
+                poly.regularize();
+                invalidate();
+                requestLayout();
+
             } else if (near instanceof Point) {
+
                 Polygon poly = ((Point)near).seek();
-                if (poly == null) {
-                    Log.e("no polygon found", "nope");
-                } else {
-                    poly.regularize();
-                    invalidate();
-                    requestLayout();
-                }
+                if (poly == null) return false;
+
+                poly.regularize();
+                invalidate();
+                requestLayout();
+
                 // only start seeking from closest point
                 return false;
             }

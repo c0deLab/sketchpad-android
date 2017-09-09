@@ -30,6 +30,16 @@ public class Line implements Shape {
         p2.lines.add(this);
     }
 
+    public void setP1(Point p) {
+        if (p.lines.indexOf(this) < 0) p.lines.add(this);
+        this.p1 = p;
+    }
+
+    public void setP2(Point p) {
+        if (p.lines.indexOf(this) < 0) p.lines.add(this);
+        this.p2 = p;
+    }
+
     public void update(Cursor c, boolean isFinal) {
 
         setActive(!isFinal);
@@ -125,10 +135,7 @@ public class Line implements Shape {
     public boolean isActive() { return active; }
 
     public void rotate(float angle, Point ref) {
-        Log.e("rotating", "line");
-        Log.e("p1 before", Float.toString(p1.x) + ", " + Float.toString(p1.y));
         p1.rotate(angle, ref);
-        Log.e("p1 after", Float.toString(p1.x) + ", " + Float.toString(p1.y));
         p2.rotate(angle, ref);
     }
 

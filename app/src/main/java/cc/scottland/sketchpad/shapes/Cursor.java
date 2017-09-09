@@ -5,6 +5,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cc.scottland.sketchpad.CanvasView;
 
 /**
@@ -14,10 +17,13 @@ import cc.scottland.sketchpad.CanvasView;
 public class Cursor extends Point {
 
     private Shape at;
+    private CanvasView cv;
 
     public Cursor() { super(); }
 
     public Cursor(int x, int y) { super(x, y); }
+
+    public void setCanvasView(CanvasView cv) { this.cv = cv; }
 
     public void on(Shape p) {
         this.at = p;
@@ -57,5 +63,18 @@ public class Cursor extends Point {
 
     public Point clone() {
         return new Point(x, y);
+    }
+
+    /**
+     * Find the shapes that the cursor is near (relative to the CanvasView).
+     * @return
+     */
+    public List<Shape> over() {
+        List<Shape> shapes = new ArrayList<Shape>();
+        for (Shape object : cv.objects) {
+            Shape near = object.near(this);
+            if (near != null) shapes.add(near);
+        }
+        return shapes;
     }
 }
