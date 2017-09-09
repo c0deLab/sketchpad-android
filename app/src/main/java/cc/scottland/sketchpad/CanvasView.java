@@ -181,6 +181,12 @@ public class CanvasView extends View {
                 return makeCompound();
             case KeyEvent.KEYCODE_8:
                 return createArc();
+            case KeyEvent.KEYCODE_9:
+                Log.e("objects:", Integer.toString(objects.size()));
+                for (Shape object : objects) {
+                    Log.e("object", object.toString());
+                }
+                return true;
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -197,6 +203,8 @@ public class CanvasView extends View {
         if (!isTouchDown) return;
 
         Point p = cursor.clone();
+        float rotateValue = (val * 0.05f);
+        float scaleValue = (val * 0.05f + 1.f);
 
         // find nearest object
         Shape nearest = null;
@@ -205,23 +213,34 @@ public class CanvasView extends View {
             if (near != null) nearest = near;
         }
 
-        if (nearest == null || nearest.isTruePoint()) return;
+        if (nearest == null) return;
 
-        // nearest must be generic
-        Generic g = (Generic)nearest;
+        if (!nearest.isTruePoint()) {
 
-        if (which == 1) {
-            action = "rotating";
-            g.original.rotate((float)val * 0.05f, cursor.target());
-        } else if (which == 2) {
-            // val starts as either -1 or 1
-            action = "scaling";
-            float factor = (float)val;
-            factor *= 0.05;    // now -0.05 or 0.05
-            factor += 1;       // now 0.95 or 1.05
-            g.original.scale(factor, cursor.target());
+            // nearest must be generic
+            Generic g = (Generic) nearest;
+
+            if (which == 1) {
+                action = "rotating";
+                g.original.rotate(rotateValue, cursor.target());
+            } else if (which == 2) {
+                action = "scaling";
+                g.original.scale(scaleValue, cursor.target());
+            }
+        // nearest is a point, check out all its lines
         } else {
-            // TODO
+            Point n = (Point)nearest;
+            for (Line l : n.lines) {
+                if (which == 1) {
+                    action = "rotating";
+                    Point other = n == l.p1 ? l.p2 : l.p1;
+                    other.rotate(rotateValue, cursor.target());
+                } else if (which == 2) {
+                    action = "scaling";
+                    Point other = n == l.p1 ? l.p2 : l.p1;
+                    other.scale(scaleValue, cursor.target());
+                }
+            }
         }
 
         invalidate();
