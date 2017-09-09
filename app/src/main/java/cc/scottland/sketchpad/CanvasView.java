@@ -164,31 +164,36 @@ public class CanvasView extends View {
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
 
+        Log.e("keycode", Integer.toString(keyCode));
+
+        if (keyCode == 131) return clearCanvas();
+
         if (!isTouchDown) return false;
 
         switch (keyCode) {
-            case KeyEvent.KEYCODE_1:
+            case 9:
                 return createCircle();
-            case KeyEvent.KEYCODE_2:
+            case 8:
                 return createLine();
-            case KeyEvent.KEYCODE_3:
+            case 11:
                 return moveObject();
-            case KeyEvent.KEYCODE_4:
+            case 12:
                 return copyObject();
-            case KeyEvent.KEYCODE_5:
+            case 13:
                 return deleteObject();
-            case KeyEvent.KEYCODE_6:
+            case 15:
                 return makeRegular();
-            case KeyEvent.KEYCODE_7:
+            case 14:
                 return makeCompound();
-            case KeyEvent.KEYCODE_8:
+            case 10:
                 return createArc();
-            case KeyEvent.KEYCODE_9:
+            /* case KeyEvent.KEYCODE_9:
                 Log.e("objects:", Integer.toString(objects.size()));
                 for (Shape object : objects) {
                     Log.e("object", object.toString());
                 }
                 return true;
+            */
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -471,6 +476,13 @@ public class CanvasView extends View {
         invalidate();
         requestLayout();
 
+        return true;
+    }
+
+    public boolean clearCanvas() {
+        objects = new ArrayList<Shape>();
+        invalidate();
+        requestLayout();
         return true;
     }
 }

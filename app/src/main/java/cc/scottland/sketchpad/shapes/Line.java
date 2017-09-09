@@ -59,8 +59,8 @@ public class Line implements Shape {
     }
 
     public void remove() {
-        p1.lines.remove(this);
-        p2.lines.remove(this);
+        if (p1 != null) p1.lines.remove(this);
+        if (p2 != null) p2.lines.remove(this);
         p1 = null;
         p2 = null;
     }
@@ -142,5 +142,13 @@ public class Line implements Shape {
     public void scale(float factor, Point ref) {
         p1.scale(factor, ref);
         p2.scale(factor, ref);
+    }
+
+    public boolean isVertical() {
+        return Math.abs(p1.y - p2.y) < 1;
+    }
+
+    public boolean isHorizontal() {
+        return Math.abs(p1.x - p2.x) < 1;
     }
 }
