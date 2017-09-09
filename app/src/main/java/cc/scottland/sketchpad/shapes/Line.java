@@ -18,7 +18,6 @@ public class Line implements Shape {
 
     public Point p1;
     public Point p2;
-    public CanvasView cv;
 
     private boolean active;
 
@@ -29,15 +28,11 @@ public class Line implements Shape {
         // add line to points
         p1.lines.add(this);
         p2.lines.add(this);
-    }
 
-    public void setCanvasView(CanvasView cv) {
-        this.cv = cv;
+        Log.e("initialized line", p1.toString() + ", " + p2.toString());
     }
 
     public void update(Cursor c, boolean isFinal) {
-
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
 
         setActive(!isFinal);
 
@@ -48,6 +43,8 @@ public class Line implements Shape {
 
         p2 = c.target();
         p2.lines.add(this);
+
+        Log.e("finalized line", p1.toString() + ", " + p2.toString());
     }
 
     public void move(int dx, int dy) {
@@ -71,8 +68,6 @@ public class Line implements Shape {
 
     public Shape near(Point pt) {
 
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
-
         int minDistance = 30;
 
         // close to an endpoint
@@ -95,7 +90,6 @@ public class Line implements Shape {
 
         if (d < minDistance) {
             Generic g = new Generic(closest.x, closest.y, this);
-            g.setCanvasView(cv);
             return g;
         }
 
@@ -106,14 +100,11 @@ public class Line implements Shape {
         Point p1 = this.p1.clone();
         Point p2 = this.p2.clone();
         Line l = new Line(p1, p2);
-        l.setCanvasView(cv);
         return l;
     }
 
     @Override
     public void draw(Canvas canvas, Paint p) {
-
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
 
         p.setColor(Color.WHITE);
 
@@ -127,8 +118,8 @@ public class Line implements Shape {
         p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(3);
         Path path = new Path();
-        path.moveTo(p1.x + cv.x, p1.y + cv.y);
-        path.lineTo(p2.x + cv.x, p2.y + cv.y);
+        path.moveTo(p1.x, p1.y);
+        path.lineTo(p2.x, p2.y);
         canvas.drawPath(path, p);
     }
 

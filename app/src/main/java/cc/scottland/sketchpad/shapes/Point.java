@@ -20,8 +20,6 @@ public class Point implements Shape {
     public float y;
     public List<Line> lines = new ArrayList<Line>();
 
-    public CanvasView cv;
-    private boolean inCanvasViewCoords = false;
     private boolean active = false;
 
     public Point() {
@@ -34,25 +32,9 @@ public class Point implements Shape {
         this.y = y;
     }
 
-    public void setCanvasView(CanvasView cv) {
-        this.cv = cv;
-    }
-
-    public void toCanvasViewCoords() {
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
-        if (!inCanvasViewCoords) {
-            inCanvasViewCoords = true;
-            this.x -= cv.x;
-            this.y -= cv.y;
-        }
-    }
-
     public void update(Cursor c, boolean isFinal) {
 
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
-
         Point p = c.clone();
-        p.toCanvasViewCoords();
 
         for (Line line : lines) line.setActive(!isFinal);
 
@@ -73,13 +55,11 @@ public class Point implements Shape {
     }
 
     public Shape near(Point p) {
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
         return Utils.distance(p, this) < 12 ? this : null;
     }
 
     public Point clone() {
         Point p = new Point(x, y);
-        p.setCanvasView(cv);
         return p;
     }
 

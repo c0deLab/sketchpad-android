@@ -29,17 +29,13 @@ public class Circle extends Point {
 
     @Override
     public void update(Cursor c, boolean isFinal) {
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
         Point p = c.clone();
-        p.toCanvasViewCoords();
         setActive(!isFinal);
         this.r = (int)Utils.distance(p, this);
     }
 
     @Override
     public Shape near(Point pt) {
-
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
 
         int minDistance = 30;
 
@@ -52,14 +48,11 @@ public class Circle extends Point {
         d.y *= (float)this.r / m;
 
         Generic g = new Generic(x + d.x, y + d.y, this);
-        g.setCanvasView(cv);
         return g;
     }
 
     @Override
     public void draw(Canvas canvas, Paint p) {
-
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
 
         p.setColor(Color.WHITE);
 
@@ -72,13 +65,12 @@ public class Circle extends Point {
 
         p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(3);
-        canvas.drawCircle(this.x + cv.x, this.y + cv.y, r, p);
+        canvas.drawCircle(this.x, this.y, r, p);
     }
 
     @Override
     public Circle clone() {
         Circle c = new Circle(x, y, r);
-        c.setCanvasView(cv);
         return c;
     }
 

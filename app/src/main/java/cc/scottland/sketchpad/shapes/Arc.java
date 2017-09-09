@@ -58,10 +58,7 @@ public class Arc extends Circle {
     @Override
     public void update(Cursor c, boolean isFinal) {
 
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
-
         Point p = c.clone();
-        p.toCanvasViewCoords();
 
         setActive(!isFinal);
 
@@ -79,8 +76,6 @@ public class Arc extends Circle {
 
     @Override
     public Shape near(Point pt) {
-
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
 
         int minDistance = 30;
 
@@ -109,14 +104,11 @@ public class Arc extends Circle {
         d.y *= (float)this.r / m;
 
         Generic g = new Generic(x + d.x, y + d.y, this);
-        g.setCanvasView(cv);
         return g;
     }
 
     @Override
     public void draw(Canvas canvas, Paint p) {
-
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
 
         p.setColor(Color.WHITE);
 
@@ -173,7 +165,6 @@ public class Arc extends Circle {
     @Override
     public Arc clone() {
         Arc a = new Arc(x, y);
-        a.setCanvasView(cv);
         a.setRadius(r);
         a.setStart(start);
         a.setEnd(end);
@@ -184,7 +175,6 @@ public class Arc extends Circle {
         float sx = (float)(r * Math.cos(Math.toRadians(start)));
         float sy = (float)(r * Math.sin(Math.toRadians(start)));
         Point p = new Point(x + sx, y + sy);
-        p.setCanvasView(cv);
         return p;
     }
 
@@ -192,7 +182,6 @@ public class Arc extends Circle {
         float sx = (float)(r * Math.cos(Math.toRadians(end)));
         float sy = (float)(r * Math.sin(Math.toRadians(end)));
         Point p = new Point(x + sx, y + sy);
-        p.setCanvasView(cv);
         return p;
     }
 

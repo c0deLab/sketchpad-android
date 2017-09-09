@@ -18,8 +18,6 @@ public class Generic extends Point {
     @Override
     public void update(Cursor c, boolean isFinal) {
 
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
-
         // if a compound, just pass the update on through
         if (original instanceof Compound) {
             original.update(c, isFinal);
@@ -27,7 +25,6 @@ public class Generic extends Point {
         }
 
         Point p = c.target();
-        p.toCanvasViewCoords();
         float dx = p.x - this.x;
         float dy = p.y - this.y;
 

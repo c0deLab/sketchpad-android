@@ -35,7 +35,7 @@ public class CanvasView extends View {
     private List<Shape> objects = new ArrayList<Shape>();
 
     private boolean isTouchDown = false;
-    private Cursor cursor = new Cursor(this);
+    private Cursor cursor = new Cursor();
     private String action = "";
 
     public int x = 0;
@@ -139,7 +139,6 @@ public class CanvasView extends View {
         cursor.off();
 
         Point p = cursor.clone();
-        p.toCanvasViewCoords();
 
         // determine if cursor is `near` any object
         for (Shape object : objects) {
@@ -188,17 +187,16 @@ public class CanvasView extends View {
     }
 
     public void addObject(Shape s) {
-        s.setCanvasView(this);
         objects.add(s);
     }
 
     public void knob(int which, int val) {
 
         // which = 1: knob one, = 2: knob two
-        // Log.e("control knob", Integer.toString(which) + " at " + Integer.toString(val));
+
+        if (!isTouchDown) return;
 
         Point p = cursor.clone();
-        p.toCanvasViewCoords();
 
         // find nearest object
         Shape nearest = null;
@@ -236,7 +234,6 @@ public class CanvasView extends View {
         toggleAction("drawing");
 
         Point pt = cursor.target();
-        if (!cursor.isOn()) pt.toCanvasViewCoords();
         Circle c = new Circle(pt.x, pt.y, 0);
         addObject(c);
         activeObj = c;
@@ -252,7 +249,6 @@ public class CanvasView extends View {
         action = "drawing";
 
         Point pt = cursor.target();
-        if (!cursor.isOn()) pt.toCanvasViewCoords();
 
         if (activeObj instanceof Arc) {
 
@@ -281,8 +277,6 @@ public class CanvasView extends View {
         toggleAction("drawing");
 
         Point p1 = cursor.target();
-        p1.setCanvasView(this);
-        if (!cursor.isOn()) p1.toCanvasViewCoords();
         Point p2 = p1.clone();
 
         Line line = new Line(p1, p2);
@@ -301,7 +295,6 @@ public class CanvasView extends View {
         if (!is("moving") || !cursor.isOn()) return false;
 
         Point p = cursor.clone();
-        p.toCanvasViewCoords();
 
         for (Shape object : objects) {
             Shape near = object.near(p);
@@ -323,7 +316,6 @@ public class CanvasView extends View {
         if (!is("moving")) return false;
 
         Point p = cursor.clone();
-        p.toCanvasViewCoords();
 
         for (Shape object : objects) {
             Shape near = object.near(p);
@@ -341,7 +333,6 @@ public class CanvasView extends View {
             cursor.target().y,
             copy
         );
-        genericCopy.setCanvasView(this);
 
         objects.add(copy);
         activeObj = genericCopy;
@@ -356,7 +347,6 @@ public class CanvasView extends View {
         List<Shape> remainingObjects = new ArrayList<Shape>();
 
         Point p = cursor.clone();
-        p.toCanvasViewCoords();
 
         for (Shape object : objects) {
 
@@ -387,7 +377,6 @@ public class CanvasView extends View {
         if (is("moving") || is("drawing")) return false;
 
         Point p = cursor.clone();
-        p.toCanvasViewCoords();
 
         for (Shape object : objects) {
 
@@ -418,7 +407,6 @@ public class CanvasView extends View {
         if (is("moving") || is("drawing")) return false;
 
         Point p = cursor.clone();
-        p.toCanvasViewCoords();
 
         Shape nearest = null;
 

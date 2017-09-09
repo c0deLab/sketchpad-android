@@ -27,7 +27,6 @@ public class Compound extends Point {
     public Compound clone() {
 
         Compound c = new Compound(x, y);
-        c.setCanvasView(cv);
 
         for (Shape shape : shapes) c.addShape(shape.clone());
 
@@ -43,8 +42,6 @@ public class Compound extends Point {
 
     public Shape near(Point p) {
 
-        if (cv == null) throw new Error(this.toString() + " has empty CanvasView!");
-
         for (Shape shape : shapes) {
 
             Shape closest = shape.near(p);
@@ -55,8 +52,6 @@ public class Compound extends Point {
 
                 x = p.x;
                 y = p.y;
-
-                g.setCanvasView(cv);
 
                 return g;
             }
@@ -70,7 +65,6 @@ public class Compound extends Point {
         if (!isComplete) return;
 
         Point p = c.target();
-        p.toCanvasViewCoords();
 
         int dx = (int)(p.x - this.x);
         int dy = (int)(p.y - this.y);

@@ -10,7 +10,6 @@ import cc.scottland.sketchpad.CanvasView;
  */
 
 public interface Shape {
-    public void setCanvasView(CanvasView cv);
     public void update(Cursor c, boolean isFinal);
     public void move(int x, int y);
 

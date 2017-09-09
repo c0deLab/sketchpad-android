@@ -17,8 +17,6 @@ public class Cursor extends Point {
 
     public Cursor() { super(); }
 
-    public Cursor(CanvasView cv) { super(); this.cv = cv; }
-
     public Cursor(int x, int y) { super(x, y); }
 
     public void on(Shape p) {
@@ -50,18 +48,14 @@ public class Cursor extends Point {
         canvas.drawLine(x, y + 12, x, y + 48, p);
 
         canvas.drawCircle(
-            isOn() ? (target().x + cv.x) : x,
-            isOn() ? (target().y + cv.y) : y,
+            isOn() ? target().x : x,
+            isOn() ? target().y : y,
             3,
             p
         );
     }
 
-    public Cursor clone() {
-        Cursor c = new Cursor(cv);
-        c.x = x;
-        c.y = y;
-        if (isOn()) c.on(at);
-        return c;
+    public Point clone() {
+        return new Point(x, y);
     }
 }
