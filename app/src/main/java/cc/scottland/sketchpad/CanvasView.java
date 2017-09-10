@@ -187,6 +187,10 @@ public class CanvasView extends View {
                 return makeCompound();
             case 10:
                 return createArc();
+            case 134:
+                return horizontalConstraint();
+            case 138:
+                return verticalConstraint();
             /* case KeyEvent.KEYCODE_9:
                 Log.e("objects:", Integer.toString(objects.size()));
                 for (Shape object : objects) {
@@ -484,5 +488,45 @@ public class CanvasView extends View {
         invalidate();
         requestLayout();
         return true;
+    }
+
+    public void lineConstraint(int which) {
+
+        // 0 = horizontal, 1 = vertical
+
+        if (is("moving") || is("drawing")) return;
+
+        Point p = cursor.clone();
+
+        for (Shape object : objects) {
+
+            Shape near = object.near(p);
+
+            // if near an object, and object is not a point
+            if (near != null && !near.isTruePoint()) {
+                Generic g = (Generic)near;
+                if (g.original instanceof Line) {
+                    Line l = (Line)(g.original);
+                    if (which == 0) {
+                        while (!l.isHorizontal()) l.rotate(0.01f, p);
+                    } else if (which == 1) {
+                        while (!l.isVertical()) l.rotate(0.01f, p);
+                    }
+                }
+            }
+        }
+
+        invalidate();
+        requestLayout();
+    }
+
+    public boolean horizontalConstraint() {
+        lineConstraint(0);
+        return true;
+    }
+
+    public boolean verticalConstraint() {
+        lineConstraint(1);
+        return false;
     }
 }

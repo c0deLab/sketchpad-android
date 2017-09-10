@@ -145,10 +145,10 @@ public class Line implements Shape {
     }
 
     public boolean isVertical() {
-        return Math.abs(p1.y - p2.y) < 1;
+        return Math.abs(p1.x - p2.x) < 1;
     }
 
     public boolean isHorizontal() {
-        return Math.abs(p1.x - p2.x) < 1;
+        return Math.abs(p1.y - p2.y) < 1;
     }
 }
