@@ -11,8 +11,10 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.Toast;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import cc.scottland.sketchpad.shapes.Arc;
 import cc.scottland.sketchpad.shapes.Circle;
@@ -164,32 +166,30 @@ public class CanvasView extends View {
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
 
-        Log.e("keycode", Integer.toString(keyCode));
-
-        if (keyCode == 131) return clearCanvas();
+        if (keyCode == 29) return clearCanvas();
 
         if (!isTouchDown) return false;
 
         switch (keyCode) {
-            case 9:
+            case 46:
                 return createCircle();
-            case 8:
+            case 45:
                 return createLine();
-            case 11:
+            case 41:
                 return moveObject();
-            case 12:
+            case 42:
                 return copyObject();
-            case 13:
+            case 43:
                 return deleteObject();
-            case 15:
+            case 38:
                 return makeRegular();
-            case 14:
+            case 37:
                 return makeCompound();
-            case 10:
+            case 47:
                 return createArc();
-            case 134:
+            case 32:
                 return horizontalConstraint();
-            case 138:
+            case 36:
                 return verticalConstraint();
             /* case KeyEvent.KEYCODE_9:
                 Log.e("objects:", Integer.toString(objects.size()));
@@ -402,11 +402,55 @@ public class CanvasView extends View {
         return true;
     }
 
+    /**
+     * Basically a depth-first search to look for a Polygon
+     * from a given Point
+     * @param start
+     * @return
+     */
+    public Polygon seek(Point start) {
+
+        // all the points connected to this point --
+        // guaranteed to form a connected graph
+        List<Point> points = new ArrayList<>();
+
+        // DFS...
+        Stack<Point> S = new Stack<>();
+
+        start.mark = true;
+        S.push(start);
+        points.add(start);
+
+        Point p;
+
+        while (!S.empty()) {
+
+            p = S.pop();
+
+            for (Point q : p.getNeighboringPoints()) {
+
+                if (!q.mark) {
+                    q.mark = true;
+                    S.push(q);
+                    points.add(q);
+                }
+            }
+        }
+
+        // reset points
+        for (Point q : points) q.mark = false;
+
+        Polygon poly = new Polygon(points);
+
+        return poly;
+    }
+
     public boolean makeRegular() {
 
         if (is("moving") || is("drawing")) return false;
 
         Point p = cursor.clone();
+        Polygon poly = null;
 
         for (Shape object : objects) {
 
@@ -418,26 +462,36 @@ public class CanvasView extends View {
                 Generic g = (Generic)near;
                 if (g.original instanceof Circle) return false;
 
-                Polygon poly = ((Line)(g.original)).p1.seek();
-                if (poly == null) return false;
-
-                poly.regularize();
-                invalidate();
-                requestLayout();
+                poly = seek(((Line)(g.original)).p1);
 
             } else if (near instanceof Point) {
-
-                Polygon poly = ((Point)near).seek();
-                if (poly == null) return false;
-
-                poly.regularize();
-                invalidate();
-                requestLayout();
-
-                // only start seeking from closest point
-                return false;
+                poly = seek((Point) near);
             }
         }
+
+        if (poly == null) return false;
+
+        poly.regularize();
+
+        for (int i = 0; i < poly.points.size() - 1; i++) {
+
+            Point p1 = poly.points.get(i);
+            Point p2 = poly.points.get(i + 1);
+
+            boolean areConnected = false;
+
+            for (Line l : p1.lines) {
+                Point other = l.p1 == p1 ? l.p2 : l.p1;
+                if (other == p2) areConnected = true;
+            }
+
+            if (!areConnected) {
+                addObject(new Line(p1, p2));
+            }
+        }
+
+        invalidate();
+        requestLayout();
 
         return true;
     }

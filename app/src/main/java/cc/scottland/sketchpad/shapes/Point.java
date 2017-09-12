@@ -22,6 +22,13 @@ public class Point implements Shape {
 
     private boolean active = false;
 
+    // set true if don't want touch go near a point
+    public boolean invisible = false;
+
+    // for doing DFS
+    public boolean mark = false;
+    public Point previous;
+
     public Point() {
         x = 0;
         y = 0;
@@ -68,6 +75,7 @@ public class Point implements Shape {
     }
 
     public Shape near(Point p) {
+        if (invisible) return null;
         return Utils.distance(p, this) < 12 ? this : null;
     }
 
@@ -148,5 +156,21 @@ public class Point implements Shape {
 
         x += ref.x;
         y += ref.y;
+    }
+
+    public List<Point> getNeighboringPoints() {
+
+        List<Point> points = new ArrayList<>();
+
+        for (Line l : lines) {
+            Point p = (this == l.p1) ? l.p2 : l.p1;
+            if (points.indexOf(p) < 0) points.add(p);
+        }
+
+        return points;
+    }
+
+    public void getInfo() {
+        Log.e(this.toString(), Float.toString(x) + ", " + Float.toString(y));
     }
 }

@@ -90,6 +90,8 @@ public class Line implements Shape {
         t = (pt.x - p1.x) * (p2.x - p1.x) + (pt.y - p1.y) * (p2.y - p1.y);
         t /= l2;
 
+        if (t < 0 || t > 1) return null;
+
         Point closest = parametrize(t);
 
         float d = Utils.distance(pt, closest);
@@ -150,5 +152,11 @@ public class Line implements Shape {
 
     public boolean isHorizontal() {
         return Math.abs(p1.y - p2.y) < 1;
+    }
+
+    public void getInfo() {
+        Log.e(this.toString(), "points...");
+        p1.getInfo();
+        p2.getInfo();
     }
 }

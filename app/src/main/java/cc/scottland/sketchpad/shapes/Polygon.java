@@ -59,46 +59,6 @@ public class Polygon implements Shape {
         return c;
     }
 
-    public boolean isRegular() {
-
-        float d = 0;
-
-        for (int i = 0; i < points.size(); i++) {
-            Point a = points.get(i);
-            Point b = points.get(i < points.size() - 1 ? i + 1 : 0);
-
-            if (i == 0) {
-                d = Utils.distance(a, b);
-            } else {
-                // can't expect to have a perfectly regular polygon
-                // with all the messiness of having to step toward it,
-                // but we can say that if any side is more than 3 units
-                // longer than another, it is NOT regular
-                if (Math.abs(Utils.distance(a, b) - d) > 3) return false;
-            }
-        }
-
-        return true;
-    }
-
-    private void stepTowardRegular() {
-
-        Point c = center();
-
-        Point p = points.get(0);
-        Log.e("angle", Double.toString(Utils.angle(c, p)));
-
-        // we don't want to move the 'start' point,
-        // so start index at 1
-//        for (int i = 1; i < points.size(); i++) {
-//            Point p = points.get(i);
-//            p.move(
-//                p.x > c.x ? 1 : p.x == c.y ? 0 : -1,
-//                p.y > c.y ? 1 : p.y == c.y ? 0 : -1
-//            );
-//        }
-    }
-
     public void regularize() {
         Point c = center();
         Point p = points.get(0);
@@ -124,4 +84,8 @@ public class Polygon implements Shape {
     // TODO ? maybe it's ok that these are noops
     public void rotate(float angle, Point ref) {}
     public void scale(float factor, Point ref) {}
+
+    public void getInfo() {
+        Log.e(this.toString(), "TODO");
+    }
 }

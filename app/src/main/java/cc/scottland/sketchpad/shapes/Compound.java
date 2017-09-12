@@ -1,6 +1,7 @@
 package cc.scottland.sketchpad.shapes;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 
@@ -22,6 +23,7 @@ public class Compound extends Point {
 
     public Compound(float x, float y) {
         super(x, y);
+        invisible = true;
     }
 
     public Compound clone() {
@@ -36,8 +38,8 @@ public class Compound extends Point {
     }
 
     public void move(int dx, int dy) {
-
-        for (Shape shape : shapes) shape.move(dx, dx);
+        // this... doesn't do anything??
+        // for (Shape shape : shapes) shape.move(dx, dx);
     }
 
     public Shape near(Point p) {
@@ -64,12 +66,15 @@ public class Compound extends Point {
 
         if (!isComplete) return;
 
+        setActive(!isFinal);
+
         Point p = c.target();
 
         int dx = (int)(p.x - this.x);
         int dy = (int)(p.y - this.y);
 
-        for (Shape shape : shapes) shape.setActive(!isFinal);
+        // don't need this here -- we update it in .draw()
+        // for (Shape shape : shapes) shape.setActive(!isFinal);
 
         for (Point point : points) point.move(dx, dy);
 
@@ -77,8 +82,19 @@ public class Compound extends Point {
     }
 
     public void draw(Canvas canvas, Paint p) {
+
+        p.setColor(Color.WHITE);
+        p.setStrokeWidth(3);
+        canvas.drawCircle(x, y, 3, p);
+
         for (Shape shape : shapes) {
-            shape.setActive(!isComplete);
+
+            if (!isComplete) {
+                shape.setActive(!isComplete);
+            } else {
+                shape.setActive(active);
+            }
+
             shape.draw(canvas, p);
         }
     }

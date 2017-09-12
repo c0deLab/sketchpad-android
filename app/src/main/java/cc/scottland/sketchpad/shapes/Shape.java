@@ -27,4 +27,6 @@ public interface Shape {
     public boolean isActive();
     public void rotate(float angle, Point ref);
     public void scale(float factor, Point ref);
+
+    public void getInfo();
 }

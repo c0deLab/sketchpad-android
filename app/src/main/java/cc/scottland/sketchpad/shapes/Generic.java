@@ -13,6 +13,7 @@ public class Generic extends Point {
     public Generic(float x, float y, Shape original) {
         super(x, y);
         this.original = original;
+        this.invisible = true;
     }
 
     @Override
