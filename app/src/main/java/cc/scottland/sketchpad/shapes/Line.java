@@ -136,6 +136,10 @@ public class Line implements Shape {
     public void setActive(boolean active) { this.active = active; }
     public boolean isActive() { return active; }
 
+    public void reset() {
+        setActive(false);
+    }
+
     public void rotate(float angle, Point ref) {
         p1.rotate(angle, ref);
         p2.rotate(angle, ref);

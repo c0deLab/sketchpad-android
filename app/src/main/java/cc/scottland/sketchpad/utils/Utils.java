@@ -19,9 +19,19 @@ public class Utils {
         return (float)Math.sqrt(dx * dx + dy * dy);
     }
 
-    public static double dot(Point p1, Point p2) {
+    /**
+     * Returns true if p2 is "left" of p1, relative to center
+     * @param center
+     * @param p1
+     * @param p2
+     * @return
+     */
+    public static boolean isLeft(Point center, Point p1, Point p2) {
+        return ((p1.x-center.x)*(p2.y-center.y)-(p1.y-center.y)*(p2.x-center.x)) > 0;
+    }
 
-        return p1.x * p2.x + p1.y * p2.y;
+    public static boolean sameSign(float a, float b) {
+        return a * b > 0.0f;
     }
 
     public static double angle(Point p1, Point p2) {

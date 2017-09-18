@@ -74,7 +74,10 @@ public class CanvasView extends View {
 
         if (isTouchDown) cursor.draw(canvas, paint);
 
-        for (Shape object : objects) object.draw(canvas, paint);
+        for (Shape object : objects) {
+            if (!isTouchDown) object.reset();
+            object.draw(canvas, paint);
+        }
 
         paint.setColor(Color.WHITE);
         paint.setTextSize(24);
@@ -119,8 +122,14 @@ public class CanvasView extends View {
      * @param e
      */
     public void onTouchEnd(MotionEvent e) {
+
         isTouchDown = false;
         cancel(e);
+
+//        for (Shape object : objects) object.reset();
+//
+//        invalidate();
+//        requestLayout();
     }
 
     public void cancel(MotionEvent e) {

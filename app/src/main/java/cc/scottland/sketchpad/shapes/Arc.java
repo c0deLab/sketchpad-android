@@ -18,13 +18,16 @@ public class Arc extends Circle {
     // two angles, in degrees
     float start; // -180 <= start < 180
     float end; // -180 < end <= 180
+    float sweep; // 0 <= sweep <= 360
 
     public boolean hasRadius = false;
     public boolean hasStart = false;
     public boolean hasEnd = false;
 
-    public static final int CLOCKWISE = 0;
-    public static final int COUNTERCLOCKWISE = 1;
+    private boolean wasLeft;
+    private boolean clockwise = true;
+
+    private boolean nearCenter = false;
 
     public Arc(float x, float y) {
         super(x, y);
@@ -56,22 +59,46 @@ public class Arc extends Circle {
     }
 
     @Override
+    public void reset() {
+        super.reset();
+        nearCenter = false;
+    }
+
+    @Override
     public void update(Cursor c, boolean isFinal) {
 
-        Point p = c.clone();
-
         setActive(!isFinal);
+
+        float angle = (float) Utils.angle(this, c.target());
+        angle = Utils.nonNegativeDegree(angle);
 
         if (!hasRadius && !hasStart) {
 
             this.r = Utils.distance(this, c.target());
-            this.start = (float) Utils.angle(this, c.target());
-            this.start = Utils.nonNegativeDegree(this.start);
+            this.start = angle;
 
-        } else if (!hasEnd) {
-            this.end = (float) Utils.angle(this, c.target());
-            this.end = Utils.nonNegativeDegree(this.end);
+            return;
         }
+
+        boolean isLeft = Utils.isLeft(this, startPoint(), c.target());
+
+        // changing directions?
+        if (wasLeft && !isLeft || !wasLeft && isLeft) {
+            // really, this should be very small, i.e. < 1...
+            // but if moving quickly, could be higher.
+            // will be in the neighborhood of 180 if going around opposite side of circle
+            if (Math.abs(angle - start) < 50) {
+                clockwise = !clockwise;
+            }
+        }
+
+        wasLeft = isLeft;
+
+        end = (float) Utils.angle(this, c.target());
+        end = Utils.nonNegativeDegree(end);
+
+        sweep = clockwise ? start - end : end - start;
+        sweep = Utils.nonNegativeDegree(sweep);
     }
 
     @Override
@@ -83,25 +110,21 @@ public class Arc extends Circle {
         double angle = Utils.angle(this, pt);
         angle = Utils.nonNegativeDegree(angle);
 
-        // near an endpoint
-        if (startPoint().near(pt) != null) return startPoint();
-        if (endPoint().near(pt) != null) return endPoint();
+        nearCenter = Utils.distance(this, pt) < minDistance;
 
-        float a = start > end ? end : start;
-        float b = start > end ? start : end;
-//        Log.e("angle", Double.toString(angle));
-//        Log.e("a", Double.toString(a));
-//        Log.e("b", Double.toString(b));
+        float a = clockwise ? end : start;
+        angle -= a;
+        angle = Utils.nonNegativeDegree(angle);
 
-        if (angle < a || angle > b) return null;
+        if (angle > sweep) return null;
 
         // too far away
-        if (Math.abs(Utils.distance(pt, this) - this.r) > minDistance) return null;
+        if (Math.abs(Utils.distance(pt, this) - r) > minDistance) return null;
 
-        Point d = new Point(pt.x - this.x, pt.y - this.y);
+        Point d = new Point(pt.x - x, pt.y - y);
         float m = Utils.distance(d, new Point());
-        d.x *= (float)this.r / m;
-        d.y *= (float)this.r / m;
+        d.x *= r / m;
+        d.y *= r / m;
 
         Generic g = new Generic(x + d.x, y + d.y, this);
         return g;
@@ -144,21 +167,37 @@ public class Arc extends Circle {
             Path path = new Path();
             path.moveTo(x, y);
             path.lineTo(x + sx, y + sy);
+
             if (!hasRadius && !hasStart) canvas.drawPath(path, p);
 
-            if (!hasStart || start == end) return;
+            if (!hasStart || Math.abs(start - end) < 0.5) return;
 
-            // arc from start to (temp) end
+            // arc from start or end (depending on direction)
+            // over `sweep` degrees
             canvas.drawArc(
                     x - r,
                     y - r,
                     x + r,
                     y + r,
-                    start,
-                    end - start,
+                    clockwise ? end : start,
+                    sweep,
                     false,
                     p
             );
+
+            if (nearCenter) {
+
+                DashPathEffect dashPath = new DashPathEffect(new float[]{8, 8}, (float) 1.0);
+                p.setPathEffect(dashPath);
+
+                path = new Path();
+                path.moveTo(startPoint().x, startPoint().y);
+                path.lineTo(x, y);
+                path.lineTo(endPoint().x, endPoint().y);
+                canvas.drawPath(path, p);
+            }
+
+            p.setPathEffect(null);
         }
     }
 
@@ -187,7 +226,9 @@ public class Arc extends Circle {
 
     @Override
     public void rotate(float angle, Point ref) {
+
         super.rotate(angle, ref);
+
         start += Math.toDegrees(angle);
         start = Utils.nonNegativeDegree(start);
         end += Math.toDegrees(angle);

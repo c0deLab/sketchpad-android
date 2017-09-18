@@ -129,6 +129,10 @@ public class Point implements Shape {
     }
     public boolean isActive() { return active; }
 
+    public void reset() {
+        setActive(false);
+    }
+
     public void rotate(float angle, Point ref) {
 
         x -= ref.x;
