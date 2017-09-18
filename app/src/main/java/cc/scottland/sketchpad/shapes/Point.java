@@ -19,6 +19,7 @@ public class Point implements Shape {
     public float x;
     public float y;
     public List<Line> lines = new ArrayList<Line>();
+    public List<Circle> circles = new ArrayList<Circle>();
 
     private boolean active = false;
 
@@ -27,7 +28,6 @@ public class Point implements Shape {
 
     // for doing DFS
     public boolean mark = false;
-    public Point previous;
 
     public Point() {
         x = 0;
@@ -44,6 +44,7 @@ public class Point implements Shape {
         Point p = c.clone();
 
         for (Line line : lines) line.setActive(!isFinal);
+        for (Circle circle : circles) circle.setActive(!isFinal);
 
         // we might want to *overwrite* this point with another,
         // as when moving the endpoint of a line to another point
@@ -65,6 +66,14 @@ public class Point implements Shape {
     public void move(int dx, int dy) {
         x += dx;
         y += dy;
+
+        // don't use circle.move() because that will
+        // try to update points
+        for (Circle circle : circles) {
+            // TODO: mark circle??
+//            circle.x += dx;
+//            circle.y += dy;
+        }
     }
 
     /**
@@ -85,41 +94,6 @@ public class Point implements Shape {
     }
 
     public void draw(Canvas canvas, Paint p) { }
-
-    public Polygon seek() {
-
-        Point p = this;
-        List<Point> pts = new ArrayList<Point>();
-
-        if (p.lines.size() < 2) return null;
-
-        Line l = p.lines.get(0);
-
-        p = (l.p1 == p) ? l.p2 : l.p1;
-
-        // add first two points
-        pts.add(this);
-        pts.add(p);
-
-        int i = 0;
-
-        while (p != this) {
-            // if at any point, we've encountered an endpoint
-            // (only connected to one line,
-            // then it can't be a polygon
-            if (p.lines.size() == 1) return null;
-
-            // next line = not the last one
-            l = p.lines.get((p.lines.get(0) == l) ? 1 : 0);
-            // next point = not the last one
-            p = (l.p1 == p) ? l.p2: l.p1;
-            if (p != this) pts.add(p);
-            i++;
-        };
-
-        // if we've exited the loop, then we found a polygon
-        return new Polygon(pts);
-    }
 
     public boolean isTruePoint() { return true; }
 

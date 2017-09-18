@@ -162,8 +162,6 @@ public class CanvasView extends View {
             Shape near = object.near(p);
             if (near == null) continue;
 
-            // near.setActive(!isFinal);
-
             cursor.on(near);
         }
 
@@ -320,6 +318,11 @@ public class CanvasView extends View {
         Point p1 = cursor.target();
         Point p2 = p1.clone();
 
+        if (cursor.target() instanceof Generic && ((Generic)(cursor.target())).original instanceof Circle) {
+            Circle cir = ((Circle)((Generic)cursor.target()).original);
+            cir.addPoint(cursor.target(), (float) Utils.angle(cir, cursor.target(), Utils.RADIANS));
+        }
+
         Line line = new Line(p1, p2);
         addObject(line);
         activeObj = line;
@@ -339,8 +342,10 @@ public class CanvasView extends View {
 
         for (Shape object : objects) {
             Shape near = object.near(p);
-            if (near == null) continue;
-            activeObj = near;
+            if (near != null) {
+                activeObj = near;
+                break;
+            }
         }
 
         if (activeObj != null) activeObj.update(cursor, false);

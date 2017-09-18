@@ -49,8 +49,26 @@ public class Line implements Shape {
             return;
         }
 
-        p2 = c.target();
-        p2.lines.add(this);
+        // can only add to point-like...
+        if (c.target().isTruePoint()) {
+
+            p2 = c.target();
+            p2.lines.add(this);
+
+        // ...or circle-like objects
+        } else if (c.target() instanceof Generic) {
+
+            Circle cir = (Circle) (((Generic)c.target()).original);
+
+            p2 = c.target();
+            p2.lines.add(this);
+
+            cir.points.add(p2);
+            cir.angles.add((float) Utils.angle(cir, c, Utils.RADIANS));
+
+            // TODO: circle updates with line attached to it
+            p2.circles.add(cir);
+        }
     }
 
     public void move(int dx, int dy) {

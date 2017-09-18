@@ -6,6 +6,10 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import cc.scottland.sketchpad.CanvasView;
 import cc.scottland.sketchpad.utils.Utils;
 
@@ -16,6 +20,8 @@ import cc.scottland.sketchpad.utils.Utils;
 public class Circle extends Point {
 
     public float r;
+    public List<Point> points = new ArrayList<>();
+    public List<Float> angles = new ArrayList<>();
 
     public Circle(float x, float y) {
         super(x, y);
@@ -29,9 +35,30 @@ public class Circle extends Point {
 
     @Override
     public void update(Cursor c, boolean isFinal) {
-        Point p = c.clone();
         setActive(!isFinal);
-        this.r = (int)Utils.distance(p, this);
+        r = (int)Utils.distance(c, this);
+        updatePoints();
+    }
+
+    public void updatePoints() {
+        for (int i = 0; i < points.size(); i++) {
+            Point p = points.get(i);
+            p.getInfo();
+            float a = angles.get(i);
+            p.x -= x;
+            p.y -= y;
+            p.x = (float) (r * Math.cos(a));
+            p.y = (float) (r * Math.sin(a));
+            p.x += x;
+            p.y += y;
+            p.getInfo();
+        }
+    }
+
+    public void addPoint(Point p, float angle) {
+        points.add(p);
+        angles.add(angle);
+        p.circles.add(this);
     }
 
     @Override
@@ -44,8 +71,8 @@ public class Circle extends Point {
 
         Point d = new Point(pt.x - this.x, pt.y - this.y);
         float m = Utils.distance(d, new Point());
-        d.x *= (float)this.r / m;
-        d.y *= (float)this.r / m;
+        d.x *= r / m;
+        d.y *= r / m;
 
         Generic g = new Generic(x + d.x, y + d.y, this);
         return g;
@@ -72,6 +99,13 @@ public class Circle extends Point {
     public Circle clone() {
         Circle c = new Circle(x, y, r);
         return c;
+    }
+
+    @Override
+    public void move(int dx, int dy) {
+        super.move(dx, dy);
+        // TODO: should we even try this?
+        // updatePoints();
     }
 
     public boolean isTruePoint() { return false; }
