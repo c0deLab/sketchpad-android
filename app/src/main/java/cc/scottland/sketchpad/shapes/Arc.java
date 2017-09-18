@@ -110,7 +110,18 @@ public class Arc extends Circle {
         double angle = Utils.angle(this, pt);
         angle = Utils.nonNegativeDegree(angle);
 
-        nearCenter = Utils.distance(this, pt) < minDistance;
+        if (Utils.distance(pt, startPoint()) < 12) {
+            Generic g = new Generic(startPoint().x, startPoint().y, this);
+            return g;
+        }
+
+        if (Utils.distance(pt, endPoint()) < 12) {
+            Generic g = new Generic(endPoint().x, endPoint().y, this);
+            return g;
+        }
+
+        // TODO?
+        // nearCenter = Utils.distance(this, pt) < minDistance;
 
         float a = clockwise ? end : start;
         angle -= a;

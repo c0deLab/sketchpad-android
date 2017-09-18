@@ -162,6 +162,8 @@ public class CanvasView extends View {
             Shape near = object.near(p);
             if (near == null) continue;
 
+            // near.setActive(!isFinal);
+
             cursor.on(near);
         }
 
@@ -566,14 +568,38 @@ public class CanvasView extends View {
             Shape near = object.near(p);
 
             // if near an object, and object is not a point
-            if (near != null && !near.isTruePoint()) {
-                Generic g = (Generic)near;
-                if (g.original instanceof Line) {
-                    Line l = (Line)(g.original);
+            if (near == null || near.isTruePoint()) continue;
+
+            Generic g = (Generic)near;
+
+            if (g.original instanceof Line) {
+
+                Line l = (Line)(g.original);
+
+                float mid;
+
+                if (which == 0) {
+                    mid = (l.p1.y + l.p2.y) / 2;
+                    l.p1.y = mid;
+                    l.p2.y = mid;
+                } else if (which == 1) {
+                    mid = (l.p1.x + l.p2.x) / 2;
+                    l.p1.x = mid;
+                    l.p2.x = mid;
+                }
+
+                // make short lines not so short
+                if (Utils.distance(l.p1, l.p2) < 30) {
                     if (which == 0) {
-                        while (!l.isHorizontal()) l.rotate(0.01f, p);
-                    } else if (which == 1) {
-                        while (!l.isVertical()) l.rotate(0.01f, p);
+                        while (Utils.distance(l.p1, l.p2) < 30) {
+                            l.p1.x--;
+                            l.p2.x++;
+                        }
+                    } else {
+                        while (Utils.distance(l.p1, l.p2) < 30) {
+                            l.p1.y--;
+                            l.p2.y++;
+                        }
                     }
                 }
             }
