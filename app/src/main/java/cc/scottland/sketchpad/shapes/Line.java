@@ -54,21 +54,27 @@ public class Line implements Shape {
 
             p2 = c.target();
             p2.lines.add(this);
+            return;
+
+        }
+
+        p2.x = c.target().x;
+        p2.y = c.target().y;
 
         // ...or circle-like objects
-        } else if (c.target() instanceof Generic) {
-
-            Circle cir = (Circle) (((Generic)c.target()).original);
-
-            p2 = c.target();
-            p2.lines.add(this);
-
-            cir.points.add(p2);
-            cir.angles.add((float) Utils.angle(cir, c, Utils.RADIANS));
-
-            // TODO: circle updates with line attached to it
-            p2.circles.add(cir);
-        }
+//        } else if (c.target() instanceof Generic) {
+//
+//            Circle cir = (Circle) (((Generic)c.target()).original);
+//
+//            p2 = c.target();
+//            p2.lines.add(this);
+//
+//            cir.points.add(p2);
+//            cir.angles.add((float) Utils.angle(cir, c, Utils.RADIANS));
+//
+//            // TODO: circle updates with line attached to it
+//            p2.circles.add(cir);
+//        }
     }
 
     public void move(int dx, int dy) {

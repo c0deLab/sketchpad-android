@@ -177,6 +177,11 @@ public class CanvasView extends View {
 
         if (keyCode == 29) return clearCanvas();
 
+        if (keyCode == 49) return loadFile1();
+        if (keyCode == 50) return loadFile2();
+        if (keyCode == 51) return loadFile3();
+        if (keyCode == 52) return loadFile4();
+
         if (!isTouchDown) return false;
 
         switch (keyCode) {
@@ -200,13 +205,6 @@ public class CanvasView extends View {
                 return horizontalConstraint();
             case 36:
                 return verticalConstraint();
-            /* case KeyEvent.KEYCODE_9:
-                Log.e("objects:", Integer.toString(objects.size()));
-                for (Shape object : objects) {
-                    Log.e("object", object.toString());
-                }
-                return true;
-            */
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -318,10 +316,10 @@ public class CanvasView extends View {
         Point p1 = cursor.target();
         Point p2 = p1.clone();
 
-        if (cursor.target() instanceof Generic && ((Generic)(cursor.target())).original instanceof Circle) {
-            Circle cir = ((Circle)((Generic)cursor.target()).original);
-            cir.addPoint(cursor.target(), (float) Utils.angle(cir, cursor.target(), Utils.RADIANS));
-        }
+//        if (cursor.target() instanceof Generic && ((Generic)(cursor.target())).original instanceof Circle) {
+//            Circle cir = ((Circle)((Generic)cursor.target()).original);
+//            cir.addPoint(cursor.target(), (float) Utils.angle(cir, cursor.target(), Utils.RADIANS));
+//        }
 
         Line line = new Line(p1, p2);
         addObject(line);
@@ -622,5 +620,157 @@ public class CanvasView extends View {
     public boolean verticalConstraint() {
         lineConstraint(1);
         return false;
+    }
+
+    public boolean loadFile1() {
+
+        clearCanvas();
+
+        Arc a = new Arc(getWidth() / 2, getHeight() / 2, 400);
+        a.setStart(315);
+        a.setEnd(225);
+
+        addObject(a);
+
+        float x1 = getWidth() / 2 - (float) Math.sqrt(2) * 200;
+        float x2 = x1 + (float) Math.sqrt(2) * 400;
+        float y1 = getHeight() / 2 - (float) Math.sqrt(2) * 200;
+        float y2 = y1 + (float) Math.sqrt(2) * 400;
+
+        Point p1 = new Point(x1, y1);
+        Point p2 = new Point(x2, y1);
+        Point p3 = new Point(x1, y2);
+        Point p4 = new Point(x2, y2);
+
+        addObject(new Line(p1, p2));
+        addObject(new Line(p1, p3));
+        addObject(new Line(p2, p4));
+        addObject(new Line(p3, p4));
+
+        addObject(new Line(p2, p3));
+        addObject(new Line(p1, p4));
+
+        invalidate();
+        requestLayout();
+
+        return true;
+    }
+
+    public boolean loadFile2() {
+
+        clearCanvas();
+
+        float x1 = getWidth() / 2 - 300;
+        float x2 = x1 + 600;
+        float y1 = getHeight() / 2 - 300;
+        float y2 = y1 + 300;
+
+        Point p1 = new Point(x1, y1);
+        Point p2 = new Point(x2, y1);
+        Point p3 = new Point(x1, y2);
+        Point p4 = new Point(x2, y2);
+
+        addObject(new Line(p1, p2));
+        addObject(new Line(p1, p3));
+        addObject(new Line(p2, p4));
+        addObject(new Line(p3, p4));
+
+        Arc a = new Arc(x1, y2, 300);
+        a.setStart(110);
+        a.setEnd(70);
+        addObject(a);
+
+        Arc b = new Arc(x2, y2, 300);
+        b.setStart(110);
+        b.setEnd(70);
+        addObject(b);
+
+        Point p3c = p3.clone();
+
+        addObject(new Line(p3c, a.startPoint()));
+        addObject(new Line(p3c, a.endPoint()));
+
+        Point p4c = p4.clone();
+
+        addObject(new Line(p4c, b.startPoint()));
+        addObject(new Line(p4c, b.endPoint()));
+
+        return true;
+    }
+
+    public boolean loadFile3() {
+
+        clearCanvas();
+
+        // PACMAN
+
+        float cx = getWidth() / 2;
+        float cy = getHeight() / 2;
+
+        Point p = new Point(cx + 200, cy);
+
+        Arc a = new Arc(p.x, p.y, 300);
+        a.setStart(160);
+        a.setEnd(200);
+        addObject(a);
+
+        addObject(new Line(p, a.startPoint()));
+        addObject(new Line(p, a.endPoint()));
+
+        addObject(new Circle(p.x - 200, p.y, 14));
+        addObject(new Circle(p.x - 300, p.y, 14));
+        addObject(new Circle(p.x - 400, p.y, 14));
+        addObject(new Circle(p.x - 500, p.y, 14));
+        addObject(new Circle(p.x - 600, p.y, 14));
+        addObject(new Circle(p.x - 700, p.y, 14));
+        addObject(new Circle(p.x - 800, p.y, 14));
+
+        return true;
+    }
+
+    public boolean loadFile4() {
+
+        clearCanvas();
+
+        float x1 = getWidth() / 2 - 300;
+        float x2 = getWidth() / 2 - 50;
+        float x3 = getWidth() / 2 + 50;
+        float x4 = getWidth() / 2 + 300;
+
+        float y1 = getHeight() / 2 - 400;
+        float y2 = getHeight() / 2 - 200;
+        float y3 = getHeight() / 2;
+        float y4 = getHeight() / 2 + 200;
+        float y5 = getHeight() / 2 + 400;
+
+        Point p1 = new Point(x1, y2);
+        Point p2 = new Point(x2, y1);
+        Point p3 = new Point(x4, y2);
+        Point p4 = new Point(x3, y3);
+
+        Point p5 = new Point(x1, y4);
+        Point p6 = new Point(x2, y3);
+        Point p7 = new Point(x4, y4);
+        Point p8 = new Point(x3, y5);
+
+        // top square
+        addObject(new Line(p1, p2));
+        addObject(new Line(p2, p3));
+        addObject(new Line(p3, p4));
+        addObject(new Line(p4, p1));
+
+        // connect top and bottom
+        addObject(new Line(p1, p5));
+        addObject(new Line(p2, p6));
+        addObject(new Line(p3, p7));
+        addObject(new Line(p4, p8));
+
+        // bottom square
+        addObject(new Line(p5, p6));
+        addObject(new Line(p6, p7));
+        addObject(new Line(p7, p8));
+        addObject(new Line(p8, p5));
+
+        return true;
     }
 }

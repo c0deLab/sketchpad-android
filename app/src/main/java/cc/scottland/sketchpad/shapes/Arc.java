@@ -16,9 +16,9 @@ import cc.scottland.sketchpad.utils.Utils;
 public class Arc extends Circle {
 
     // two angles, in degrees
-    float start; // -180 <= start < 180
-    float end; // -180 < end <= 180
-    float sweep; // 0 <= sweep <= 360
+    public float start; // -180 <= start < 180
+    public float end; // -180 < end <= 180
+    public float sweep; // 0 <= sweep <= 360
 
     public boolean hasRadius = false;
     public boolean hasStart = false;
@@ -41,6 +41,7 @@ public class Arc extends Circle {
         super(x, y, r);
         this.start = start;
         this.end = end;
+        this.sweep = end - start;
     }
 
     public void setRadius(float r) {
@@ -56,6 +57,8 @@ public class Arc extends Circle {
     public void setEnd(float end) {
         this.end = Utils.nonNegativeDegree(end);
         hasEnd = true;
+        sweep = clockwise ? start - end : end - start;
+        sweep = Utils.nonNegativeDegree(sweep);
     }
 
     @Override
@@ -196,17 +199,17 @@ public class Arc extends Circle {
                     p
             );
 
-            if (nearCenter) {
-
-                DashPathEffect dashPath = new DashPathEffect(new float[]{8, 8}, (float) 1.0);
-                p.setPathEffect(dashPath);
-
-                path = new Path();
-                path.moveTo(startPoint().x, startPoint().y);
-                path.lineTo(x, y);
-                path.lineTo(endPoint().x, endPoint().y);
-                canvas.drawPath(path, p);
-            }
+//            if (nearCenter) {
+//
+//                DashPathEffect dashPath = new DashPathEffect(new float[]{8, 8}, (float) 1.0);
+//                p.setPathEffect(dashPath);
+//
+//                path = new Path();
+//                path.moveTo(startPoint().x, startPoint().y);
+//                path.lineTo(x, y);
+//                path.lineTo(endPoint().x, endPoint().y);
+//                canvas.drawPath(path, p);
+//            }
 
             p.setPathEffect(null);
         }
