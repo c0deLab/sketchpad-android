@@ -95,14 +95,18 @@ public class MainActivity extends AppCompatActivity {
             final Runnable updaterOne = new Runnable() {
                 public void run() {
                     char result = bufferOne.getChar(0);
-                    cv.knob(1, result == 1 ? 1 : -1);
+                    cv.whichKnob = cv.KNOB_LEFT;
+                    cv.knobVal = result == 1 ? 1 : -1;
+                    cv.knob.run();
                 }
             };
 
             final Runnable updaterTwo = new Runnable() {
                 public void run() {
                     char result = bufferTwo.getChar(0);
-                    cv.knob(2, result == 1 ? 1 : -1);
+                    cv.whichKnob = cv.KNOB_RIGHT;
+                    cv.knobVal = result == 1 ? 1 : -1;
+                    cv.knob.run();
                 }
             };
 

@@ -1,6 +1,5 @@
 package cc.scottland.sketchpad;
 
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
@@ -45,27 +44,32 @@ public class CanvasView extends View {
     public int x = 0;
     public int y = 0;
 
+    private Point p = null;
+    private boolean isFinal = false;
+
     private int bg = Color.BLACK;
+
+    public int whichKnob = -1;
+    public int knobVal = 0;
+
+    public static final int KNOB_LEFT = 1;
+    public static final int KNOB_RIGHT = 2;
 
     private Shape activeObj;
 
-    private Context context;
-
     public CanvasView(Context context) {
         super(context);
-        this.context = context;
         cursor.setCanvasView(this);
         init();
     }
 
     public CanvasView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.context = context;
         cursor.setCanvasView(this);
         init();
     }
 
-    final Thread drawEverything = new Thread(new Runnable() {
+    final Thread drawThread = new Thread(new Runnable() {
 
         public void run() {
 
@@ -81,12 +85,37 @@ public class CanvasView extends View {
         }
     });
 
+    final Thread updateThread = new Thread(new Runnable() {
+
+        public void run() {
+
+            if (p == null) return;
+
+            // determine if cursor is `near` any object
+            for (Shape object : objects) {
+
+                if (is("moving")) break; // but not if we're moving an object
+                if (object == activeObj) break;
+
+                Shape near = object.near(p);
+                if (near == null) continue;
+
+                cursor.on(near);
+            }
+
+            // update active object, if it exists
+            if (activeObj != null) activeObj.update(cursor, isFinal);
+
+            p = null;
+        }
+    });
+
     @Override
     public void onDraw(Canvas canvas) {
 
         this.canvas = canvas;
 
-        drawEverything.run();
+        drawThread.run();
     }
 
     public void init() {
@@ -149,22 +178,10 @@ public class CanvasView extends View {
         cursor.y = y;
         cursor.off();
 
-        Point p = cursor.clone();
+        p = cursor.clone();
+        this.isFinal = isFinal;
 
-        // determine if cursor is `near` any object
-        for (Shape object : objects) {
-
-            if (is("moving")) break; // but not if we're moving an object
-            if (object == activeObj) break;
-
-            Shape near = object.near(p);
-            if (near == null) continue;
-
-            cursor.on(near);
-        }
-
-        // update active object, if it exists
-        if (activeObj != null) activeObj.update(cursor, isFinal);
+        updateThread.run();
 
         invalidate();
     }
@@ -191,21 +208,27 @@ public class CanvasView extends View {
             case 45:
                 return createLine();
             case 41:
-                return moveObject();
+                moveObject.run();
+                return true;
             case 42:
-                return copyObject();
+                copyObject.run();
+                return true;
             case 43:
-                return deleteObject();
+                deleteObject.run();
+                return true;
             case 38:
                 return makeRegular();
             case 37:
-                return makeCompound();
+                makeCompound.run();
+                return true;
             case 47:
                 return createArc();
             case 32:
-                return horizontalConstraint();
+                horizontalConstraint.run();
+                return true;
             case 36:
-                return verticalConstraint();
+                verticalConstraint.run();
+                return true;
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -215,55 +238,56 @@ public class CanvasView extends View {
         objects.add(s);
     }
 
-    public void knob(int which, int val) {
+    public final Thread knob = new Thread(new Runnable() {
 
-        // which = 1: knob one, = 2: knob two
+        public void run() {
 
-        if (!isTouchDown) return;
+            if (!isTouchDown) return;
 
-        Point p = cursor.clone();
-        float rotateValue = (val * 0.05f);
-        float scaleValue = (val * 0.05f + 1.f);
+            Point p = cursor.clone();
+            float rotateValue = (knobVal * 0.05f);
+            float scaleValue = (knobVal * 0.05f + 1.f);
 
-        // find nearest object
-        Shape nearest = null;
-        for (Shape object : objects) {
-            Shape near = object.near(p);
-            if (near != null) nearest = near;
-        }
-
-        if (nearest == null) return;
-
-        if (!nearest.isTruePoint()) {
-
-            // nearest must be generic
-            Generic g = (Generic) nearest;
-
-            if (which == 1) {
-                action = "rotating";
-                g.original.rotate(rotateValue, cursor.target());
-            } else if (which == 2) {
-                action = "scaling";
-                g.original.scale(scaleValue, cursor.target());
+            // find nearest object
+            Shape nearest = null;
+            for (Shape object : objects) {
+                Shape near = object.near(p);
+                if (near != null) nearest = near;
             }
-        // nearest is a point, check out all its lines
-        } else {
-            Point n = (Point)nearest;
-            for (Line l : n.lines) {
-                if (which == 1) {
+
+            if (nearest == null) return;
+
+            if (!nearest.isTruePoint()) {
+
+                // nearest must be generic
+                Generic g = (Generic) nearest;
+
+                if (whichKnob == KNOB_LEFT) {
                     action = "rotating";
-                    Point other = n == l.p1 ? l.p2 : l.p1;
-                    other.rotate(rotateValue, cursor.target());
-                } else if (which == 2) {
+                    g.original.rotate(rotateValue, cursor.target());
+                } else if (whichKnob == KNOB_RIGHT) {
                     action = "scaling";
-                    Point other = n == l.p1 ? l.p2 : l.p1;
-                    other.scale(scaleValue, cursor.target());
+                    g.original.scale(scaleValue, cursor.target());
+                }
+                // nearest is a point, check out all its lines
+            } else {
+                Point n = (Point)nearest;
+                for (Line l : n.lines) {
+                    if (whichKnob == KNOB_LEFT) {
+                        action = "rotating";
+                        Point other = n == l.p1 ? l.p2 : l.p1;
+                        other.rotate(rotateValue, cursor.target());
+                    } else if (whichKnob == KNOB_RIGHT) {
+                        action = "scaling";
+                        Point other = n == l.p1 ? l.p2 : l.p1;
+                        other.scale(scaleValue, cursor.target());
+                    }
                 }
             }
-        }
 
-        invalidate();
-    }
+            invalidate();
+        }
+    });
 
     public boolean createCircle() {
 
@@ -329,92 +353,100 @@ public class CanvasView extends View {
         return true;
     }
 
-    public boolean moveObject() {
+    final Thread moveObject = new Thread(new Runnable() {
 
-        if (!cursor.isOn()) return false;
+        public void run() {
 
-        toggleAction("moving");
+            if (!cursor.isOn()) return;
 
-        if (!is("moving") || !cursor.isOn()) return false;
+            toggleAction("moving");
 
-        Point p = cursor.clone();
+            if (!is("moving") || !cursor.isOn()) return;
 
-        for (Shape object : objects) {
-            Shape near = object.near(p);
-            if (near != null) {
+            p = cursor.clone();
+            isFinal = false;
+
+            for (Shape object : objects) {
+                Shape near = object.near(p);
+                if (near != null) {
+                    activeObj = near;
+                    break;
+                }
+            }
+
+            if (activeObj != null) activeObj.update(cursor, false);
+
+            p = null;
+        }
+    });
+
+    final Thread copyObject = new Thread(new Runnable() {
+
+        public void run() {
+
+            if (!cursor.isOn()) return;
+
+            toggleAction("moving");
+
+            if (!is("moving")) return;
+
+            p = cursor.clone();
+
+            for (Shape object : objects) {
+                Shape near = object.near(p);
+                if (near == null) continue;
                 activeObj = near;
-                break;
-            }
-        }
-
-        if (activeObj != null) activeObj.update(cursor, false);
-
-        return true;
-    }
-
-    public boolean copyObject() {
-
-        if (!cursor.isOn()) return false;
-
-        toggleAction("moving");
-
-        if (!is("moving")) return false;
-
-        Point p = cursor.clone();
-
-        for (Shape object : objects) {
-            Shape near = object.near(p);
-            if (near == null) continue;
-            activeObj = near;
-        }
-
-        // must copy a Generic resulting from near object
-        if (activeObj == null || !(activeObj instanceof Generic)) return false;
-
-        Shape copy = ((Generic)activeObj).original.clone();
-
-        Generic genericCopy = new Generic(
-            cursor.target().x,
-            cursor.target().y,
-            copy
-        );
-
-        objects.add(copy);
-        activeObj = genericCopy;
-
-        return true;
-    }
-
-    public boolean deleteObject() {
-
-        if (is("moving") || is("drawing")) return false;
-
-        List<Shape> remainingObjects = new ArrayList<Shape>();
-
-        Point p = cursor.clone();
-
-        for (Shape object : objects) {
-
-            // if it's a point with no lines, remove it
-            if (object.isTruePoint() && ((Point)object).lines.size() == 0) {
-                object.remove();
             }
 
-            // if not near the object, keep it
-            if (object.near(p) == null) {
-                remainingObjects.add(object);
-            // otherwise, remove it
-            } else {
-                object.remove();
-            }
+            // must copy a Generic resulting from near object
+            if (activeObj == null || !(activeObj instanceof Generic)) return;
+
+            Shape copy = ((Generic)activeObj).original.clone();
+
+            Generic genericCopy = new Generic(
+                    cursor.target().x,
+                    cursor.target().y,
+                    copy
+            );
+
+            objects.add(copy);
+            activeObj = genericCopy;
+
+            return;
         }
+    });
 
-        objects = remainingObjects;
+    final Thread deleteObject = new Thread(new Runnable() {
 
-        invalidate();
+        public void run() {
 
-        return true;
-    }
+            if (is("moving") || is("drawing")) return;
+
+            List<Shape> remainingObjects = new ArrayList<Shape>();
+
+            p = cursor.clone();
+
+            for (Shape object : objects) {
+
+                // if it's a point with no lines, remove it
+                if (object.isTruePoint() && ((Point)object).lines.size() == 0) {
+                    object.remove();
+                }
+
+                // if not near the object, keep it
+                if (object.near(p) == null) {
+                    remainingObjects.add(object);
+                    // otherwise, remove it
+                } else {
+                    object.remove();
+                }
+            }
+
+            objects = remainingObjects;
+
+            invalidate();
+        }
+    });
 
     /**
      * Basically a depth-first search to look for a Polygon
@@ -509,45 +541,45 @@ public class CanvasView extends View {
         return true;
     }
 
-    public boolean makeCompound() {
+    final Thread makeCompound = new Thread(new Runnable() {
 
-        if (is("moving") || is("drawing")) return false;
+        public void run() {
+            if (is("moving") || is("drawing")) return;
 
-        Point p = cursor.clone();
+            p = cursor.clone();
 
-        Shape nearest = null;
+            Shape nearest = null;
 
-        for (Shape object : objects) {
-            Shape near = object.near(p);
-            if (near != null) nearest = near;
+            for (Shape object : objects) {
+                Shape near = object.near(p);
+                if (near != null) nearest = near;
+            }
+
+            if (nearest == null || nearest.isTruePoint()) return;
+
+            // guaranteed a generic object now
+            Generic g = (Generic)nearest;
+
+            // if we're just starting, add a new compound
+            if (!is("making compound")) {
+
+                Compound c = new Compound(p.x, p.y);
+                c.addShape(g.original);
+                addObject(c);
+
+                activeObj = c;
+
+            } else {
+                ((Compound)activeObj).addShape(g.original);
+            }
+
+            objects.remove(g.original);
+
+            action = "making compound";
+
+            invalidate();
         }
-
-        if (nearest == null || nearest.isTruePoint()) return false;
-
-        // guaranteed a generic object now
-        Generic g = (Generic)nearest;
-
-        // if we're just starting, add a new compound
-        if (!is("making compound")) {
-
-            Compound c = new Compound(p.x, p.y);
-            c.addShape(g.original);
-            addObject(c);
-
-            activeObj = c;
-
-        } else {
-            ((Compound)activeObj).addShape(g.original);
-        }
-
-        objects.remove(g.original);
-
-        action = "making compound";
-
-        invalidate();
-
-        return true;
-    }
+    });
 
     public boolean clearCanvas() {
         objects = new ArrayList<Shape>();
@@ -608,15 +640,13 @@ public class CanvasView extends View {
         invalidate();
     }
 
-    public boolean horizontalConstraint() {
-        lineConstraint(0);
-        return true;
-    }
+    final Thread horizontalConstraint = new Thread(new Runnable() {
+        public void run() { lineConstraint(0); }
+    });
 
-    public boolean verticalConstraint() {
-        lineConstraint(1);
-        return false;
-    }
+    final Thread verticalConstraint = new Thread(new Runnable() {
+        public void run() { lineConstraint(1); }
+    });
 
     public boolean loadFile1() {
 
