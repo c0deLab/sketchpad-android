@@ -31,9 +31,10 @@ public class MainActivity extends AppCompatActivity {
     private UsbDevice controlTwo;
     private UsbDeviceConnection controlOneConnection;
     private UsbDeviceConnection controlTwoConnection;
-    private UsbRequest controlOneRequest;
-    private UsbRequest controlTwoRequest;
     private PendingIntent mPermissionIntent;
+
+    private static final String ACTION_USB_PERMISSION =
+            "cc.scottland.sketchpad.USB_PERMISSION";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,15 +59,12 @@ public class MainActivity extends AppCompatActivity {
         HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
         Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
 
-        while(deviceIterator.hasNext()) {
+        while (deviceIterator.hasNext()) {
 
             UsbDevice device = deviceIterator.next();
 
             // control knobs
             if (device.getVendorId() == 1917 && device.getProductId() == 1040) {
-
-                // grant permission here...
-                mUsbManager.requestPermission(device, mPermissionIntent);
 
                 if (controlOne == null) {
                     controlOne = device;
@@ -80,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (controlOneConnection != null && controlTwoConnection != null) {
 
-            final int TIMEOUT = 100;
             final boolean forceClaim = true;
 
             UsbInterface controlOneIntf = controlOne.getInterface(0);
@@ -92,12 +89,32 @@ public class MainActivity extends AppCompatActivity {
             final UsbEndpoint controlTwoEndpoint = controlTwoIntf.getEndpoint(0);
             controlTwoConnection.claimInterface(controlOneIntf, forceClaim);
 
+            final ByteBuffer bufferOne = ByteBuffer.allocate(size);
+            final ByteBuffer bufferTwo = ByteBuffer.allocate(size);
+
+            final Runnable updaterOne = new Runnable() {
+                public void run() {
+                    char result = bufferOne.getChar(0);
+                    cv.knob(1, result == 1 ? 1 : -1);
+                }
+            };
+
+            final Runnable updaterTwo = new Runnable() {
+                public void run() {
+                    char result = bufferTwo.getChar(0);
+                    cv.knob(2, result == 1 ? 1 : -1);
+                }
+            };
+
+            final UsbRequest requestOne = new UsbRequest(); // create an URB
+            final boolean initOne = requestOne.initialize(controlOneConnection, controlOneEndpoint);
+
+            final UsbRequest requestTwo = new UsbRequest(); // create an URB
+            final boolean initTwo = requestTwo.initialize(controlTwoConnection, controlTwoEndpoint);
+
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-
-                    UsbRequest requestOne = new UsbRequest(); // create an URB
-                    boolean initOne = requestOne.initialize(controlOneConnection, controlOneEndpoint);
 
                     if (!initOne) {
                         Log.e("USB CONNECTION FAILED", "Request initialization failed for reading");
@@ -106,16 +123,9 @@ public class MainActivity extends AppCompatActivity {
 
                     while (true) {
 
-                        final ByteBuffer bufferOne = ByteBuffer.allocate(size);
-
                         if (requestOne.queue(bufferOne, size) == true && controlOneConnection.requestWait() == requestOne) {
 
-                            runOnUiThread (new Thread(new Runnable() {
-                                public void run() {
-                                    char result = bufferOne.getChar(0);
-                                    cv.knob(1, result == 1 ? 1 : -1);
-                                }
-                            }));
+                            runOnUiThread(updaterOne);
                         }
                     }
                 }
@@ -125,9 +135,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
 
-                    UsbRequest requestTwo = new UsbRequest(); // create an URB
-                    boolean initTwo = requestTwo.initialize(controlTwoConnection, controlTwoEndpoint);
-
                     if (!initTwo) {
                         Log.e("USB CONNECTION FAILED", "Request initialization failed for reading");
                         return;
@@ -135,24 +142,14 @@ public class MainActivity extends AppCompatActivity {
 
                     while (true) {
 
-                        final ByteBuffer bufferTwo = ByteBuffer.allocate(size);
-
                         if (requestTwo.queue(bufferTwo, size) == true && controlTwoConnection.requestWait() == requestTwo) {
 
-                            runOnUiThread (new Thread(new Runnable() {
-                                public void run() {
-                                    char result = bufferTwo.getChar(0);
-                                    cv.knob(2, result == 1 ? 1 : -1);
-                                }
-                            }));
+                            runOnUiThread (updaterTwo);
                         }
                     }
                 }
             }).start();
         }
-
-        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-        registerReceiver(mUsbReceiver, filter);
     }
 
     @Override
@@ -167,28 +164,4 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-
-    private static final String ACTION_USB_PERMISSION =
-            "cc.scottland.sketchpad.USB_PERMISSION";
-    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
-
-        public void onReceive(Context context, Intent intent) {
-
-            String action = intent.getAction();
-            Log.e("received", action);
-
-            if (ACTION_USB_PERMISSION.equals(action)) {
-                synchronized (this) {
-                    UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        if (device != null){
-                            //call method to set up device communication
-                            Log.e("device", device.toString());
-                        }
-                    }
-                }
-            }
-        }
-    };
 }

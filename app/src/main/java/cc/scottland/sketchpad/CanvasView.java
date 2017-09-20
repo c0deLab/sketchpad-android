@@ -1,5 +1,6 @@
 package cc.scottland.sketchpad;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
@@ -33,6 +34,7 @@ import cc.scottland.sketchpad.utils.Utils;
 
 public class CanvasView extends View {
 
+    private Canvas canvas;
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     public List<Shape> objects = new ArrayList<Shape>();
 
@@ -63,35 +65,32 @@ public class CanvasView extends View {
         init();
     }
 
+    final Thread drawEverything = new Thread(new Runnable() {
+
+        public void run() {
+
+            if (canvas == null) return;
+
+            paint.setColor(bg);
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
+
+            if (isTouchDown) cursor.draw(canvas, paint);
+
+            for (Shape object : objects) object.draw(canvas, paint);
+        }
+    });
+
     @Override
     public void onDraw(Canvas canvas) {
 
-        super.onDraw(canvas);
+        this.canvas = canvas;
 
-        paint.setColor(bg);
-        paint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
-
-        if (isTouchDown) cursor.draw(canvas, paint);
-
-        for (Shape object : objects) {
-            if (!isTouchDown) object.reset();
-            object.draw(canvas, paint);
-        }
-
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(24);
-        paint.setStyle(Paint.Style.FILL);
-        canvas.drawText(action.toUpperCase(), 24, 40, paint);
-
-        invalidate();
-        requestLayout();
+        drawEverything.run();
     }
 
     public void init() {
-
         invalidate();
-        requestLayout();
     }
 
     /**
@@ -128,8 +127,7 @@ public class CanvasView extends View {
 
 //        for (Shape object : objects) object.reset();
 //
-//        invalidate();
-//        requestLayout();
+        invalidate();
     }
 
     public void cancel(MotionEvent e) {
@@ -169,13 +167,16 @@ public class CanvasView extends View {
         if (activeObj != null) activeObj.update(cursor, isFinal);
 
         invalidate();
-        requestLayout();
     }
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
 
         if (keyCode == 29) return clearCanvas();
+        if (keyCode == 30) {
+            System.exit(0);
+            return false;
+        }
 
         if (keyCode == 49) return loadFile1();
         if (keyCode == 50) return loadFile2();
@@ -411,7 +412,6 @@ public class CanvasView extends View {
         objects = remainingObjects;
 
         invalidate();
-        requestLayout();
 
         return true;
     }
@@ -505,7 +505,6 @@ public class CanvasView extends View {
         }
 
         invalidate();
-        requestLayout();
 
         return true;
     }
@@ -546,7 +545,6 @@ public class CanvasView extends View {
         action = "making compound";
 
         invalidate();
-        requestLayout();
 
         return true;
     }
@@ -554,7 +552,6 @@ public class CanvasView extends View {
     public boolean clearCanvas() {
         objects = new ArrayList<Shape>();
         invalidate();
-        requestLayout();
         return true;
     }
 
@@ -609,7 +606,6 @@ public class CanvasView extends View {
         }
 
         invalidate();
-        requestLayout();
     }
 
     public boolean horizontalConstraint() {
@@ -649,9 +645,6 @@ public class CanvasView extends View {
 
         addObject(new Line(p2, p3));
         addObject(new Line(p1, p4));
-
-        invalidate();
-        requestLayout();
 
         return true;
     }
@@ -705,7 +698,7 @@ public class CanvasView extends View {
         // PACMAN
 
         float cx = getWidth() / 2;
-        float cy = getHeight() / 2;
+        float cy = getHeight() / 2 + 100;
 
         Point p = new Point(cx + 200, cy);
 
