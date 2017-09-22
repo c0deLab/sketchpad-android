@@ -652,7 +652,7 @@ public class CanvasView extends View {
 
         clearCanvas();
 
-        Arc a = new Arc(getWidth() / 2, getHeight() / 2, 400);
+        Arc a = new Arc(getWidth() / 2, getHeight() / 2 + 20, 400);
         a.setStart(315);
         a.setEnd(225);
 
@@ -660,8 +660,8 @@ public class CanvasView extends View {
 
         float x1 = getWidth() / 2 - (float) Math.sqrt(2) * 200;
         float x2 = x1 + (float) Math.sqrt(2) * 400;
-        float y1 = getHeight() / 2 - (float) Math.sqrt(2) * 200;
-        float y2 = y1 + (float) Math.sqrt(2) * 400;
+        float y1 = getHeight() / 2 - (float) Math.sqrt(2) * 200 + 20;
+        float y2 = y1 + (float) Math.sqrt(2) * 400 + 20;
 
         Point p1 = new Point(x1, y1);
         Point p2 = new Point(x2, y1);
@@ -685,8 +685,8 @@ public class CanvasView extends View {
 
         float x1 = getWidth() / 2 - 300;
         float x2 = x1 + 600;
-        float y1 = getHeight() / 2 - 300;
-        float y2 = y1 + 300;
+        float y1 = getHeight() / 2 - 300 + 20;
+        float y2 = y1 + 300 + 20;
 
         Point p1 = new Point(x1, y1);
         Point p2 = new Point(x2, y1);
@@ -725,28 +725,31 @@ public class CanvasView extends View {
 
         clearCanvas();
 
-        // PACMAN
+        float x1 = getWidth() / 2 - 300;
+        float x2 = x1 + 200;
+        float x3 = x1 + 600;
+        float y1 = getHeight() / 2 - 300 + 20;
+        float y2 = y1 + 400 + 20;
+        float y3 = y1 + 600 + 20;
 
-        float cx = getWidth() / 2;
-        float cy = getHeight() / 2 + 100;
+        Point p1 = new Point(x1, y1);
+        Point p2 = new Point(x2, y1);
+        Point p3 = new Point(x3, y1);
+        Point p4 = new Point(x2, y2);
+        Point p5 = new Point(x3, y2);
+        Point p6 = new Point(x1, y3);
+        Point p7 = new Point(x3, y3);
 
-        Point p = new Point(cx + 200, cy);
-
-        Arc a = new Arc(p.x, p.y, 300);
-        a.setStart(160);
-        a.setEnd(200);
-        addObject(a);
-
-        addObject(new Line(p, a.startPoint()));
-        addObject(new Line(p, a.endPoint()));
-
-        addObject(new Circle(p.x - 200, p.y, 14));
-        addObject(new Circle(p.x - 300, p.y, 14));
-        addObject(new Circle(p.x - 400, p.y, 14));
-        addObject(new Circle(p.x - 500, p.y, 14));
-        addObject(new Circle(p.x - 600, p.y, 14));
-        addObject(new Circle(p.x - 700, p.y, 14));
-        addObject(new Circle(p.x - 800, p.y, 14));
+        addObject(new Line(p1, p2));
+        addObject(new Line(p2, p3));
+        addObject(new Line(p1, p6));
+        addObject(new Line(p2, p4));
+        addObject(new Line(p3, p5));
+        addObject(new Line(p2, p5));
+        addObject(new Line(p3, p4));
+        addObject(new Line(p4, p5));
+        addObject(new Line(p5, p7));
+        addObject(new Line(p6, p7));
 
         return true;
     }
