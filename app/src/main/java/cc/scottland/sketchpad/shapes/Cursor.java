@@ -48,10 +48,13 @@ public class Cursor extends Point {
         p.setColor(Color.WHITE);
         p.setStrokeWidth(3);
 
-        canvas.drawLine(x - 48, y, x - 12, y, p);
-        canvas.drawLine(x + 48, y, x + 12, y, p);
-        canvas.drawLine(x, y - 12, x, y - 48, p);
-        canvas.drawLine(x, y + 12, x, y + 48, p);
+        int toEnd = 64;
+        int fromCenter = 16;
+
+        canvas.drawLine(x - toEnd, y, x - fromCenter, y, p);
+        canvas.drawLine(x + toEnd, y, x + fromCenter, y, p);
+        canvas.drawLine(x, y - fromCenter, x, y - toEnd, p);
+        canvas.drawLine(x, y + fromCenter, x, y + toEnd, p);
 
         canvas.drawCircle(
             isOn() ? target().x : x,
