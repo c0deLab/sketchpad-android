@@ -652,15 +652,18 @@ public class CanvasView extends View {
 
         clearCanvas();
 
-        Arc a = new Arc(getWidth() / 2, getHeight() / 2 + 20, 400);
+        int cx = getWidth () / 2;
+        int cy = getHeight() / 3;
+
+        Arc a = new Arc(cx, cy + 20, 400);
         a.setStart(315);
         a.setEnd(225);
 
         addObject(a);
 
-        float x1 = getWidth() / 2 - (float) Math.sqrt(2) * 200;
+        float x1 = cx - (float) Math.sqrt(2) * 200;
         float x2 = x1 + (float) Math.sqrt(2) * 400;
-        float y1 = getHeight() / 2 - (float) Math.sqrt(2) * 200 + 20;
+        float y1 = cy - (float) Math.sqrt(2) * 200 + 20;
         float y2 = y1 + (float) Math.sqrt(2) * 400 + 20;
 
         Point p1 = new Point(x1, y1);
@@ -683,9 +686,12 @@ public class CanvasView extends View {
 
         clearCanvas();
 
-        float x1 = getWidth() / 2 - 300;
+        int cx = getWidth() / 2;
+        int cy = getHeight() / 3;
+
+        float x1 = cx - 300;
         float x2 = x1 + 600;
-        float y1 = getHeight() / 2 - 300 + 20;
+        float y1 = cy - 300 + 20;
         float y2 = y1 + 300 + 20;
 
         Point p1 = new Point(x1, y1);
@@ -725,10 +731,13 @@ public class CanvasView extends View {
 
         clearCanvas();
 
-        float x1 = getWidth() / 2 - 300;
+        int cx = getWidth() / 2;
+        int cy = getHeight() / 3;
+
+        float x1 = cx - 300;
         float x2 = x1 + 200;
         float x3 = x1 + 600;
-        float y1 = getHeight() / 2 - 300 + 20;
+        float y1 = cy - 300 + 20;
         float y2 = y1 + 400 + 20;
         float y3 = y1 + 600 + 20;
 
@@ -758,16 +767,19 @@ public class CanvasView extends View {
 
         clearCanvas();
 
-        float x1 = getWidth() / 2 - 300;
-        float x2 = getWidth() / 2 - 50;
-        float x3 = getWidth() / 2 + 50;
-        float x4 = getWidth() / 2 + 300;
+        int cx = getWidth() / 2;
+        int cy = getHeight() / 3;
 
-        float y1 = getHeight() / 2 - 400;
-        float y2 = getHeight() / 2 - 200;
-        float y3 = getHeight() / 2;
-        float y4 = getHeight() / 2 + 200;
-        float y5 = getHeight() / 2 + 400;
+        float x1 = cx - 300;
+        float x2 = cx - 50;
+        float x3 = cx + 50;
+        float x4 = cx + 300;
+
+        float y1 = cy - 400;
+        float y2 = cy - 200;
+        float y3 = cy;
+        float y4 = cy + 200;
+        float y5 = cy + 400;
 
         Point p1 = new Point(x1, y2);
         Point p2 = new Point(x2, y1);
