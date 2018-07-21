@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
                     while (true) {
 
-                        if (requestOne.queue(bufferOne, size) == true && controlOneConnection.requestWait() == requestOne) {
+                        if (requestOne.queue(bufferOne, size) && controlOneConnection.requestWait() == requestOne) {
 
                             runOnUiThread(updaterOne);
                         }
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
                     while (true) {
 
-                        if (requestTwo.queue(bufferTwo, size) == true && controlTwoConnection.requestWait() == requestTwo) {
+                        if (requestTwo.queue(bufferTwo, size) && controlTwoConnection.requestWait() == requestTwo) {
 
                             runOnUiThread (updaterTwo);
                         }
@@ -154,6 +154,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).start();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Maybe hide UI again
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(uiOptions);
     }
 
     @Override
@@ -168,4 +177,6 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
+
+
 }
