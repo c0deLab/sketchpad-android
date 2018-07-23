@@ -101,13 +101,6 @@ public class Circle extends Point {
         return c;
     }
 
-    @Override
-    public void move(int dx, int dy) {
-        super.move(dx, dy);
-        // TODO: should we even try this?
-        // updatePoints();
-    }
-
     public boolean isTruePoint() { return false; }
 
     public void scale(float factor, Point ref) {
