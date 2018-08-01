@@ -659,8 +659,6 @@ public class CanvasView extends View {
         a.setStart(315);
         a.setEnd(225);
 
-        addObject(a);
-
         float x1 = cx - (float) Math.sqrt(2) * 200;
         float x2 = x1 + (float) Math.sqrt(2) * 400;
         float y1 = cy - (float) Math.sqrt(2) * 200 + 20;
@@ -671,13 +669,26 @@ public class CanvasView extends View {
         Point p3 = new Point(x1, y2);
         Point p4 = new Point(x2, y2);
 
-        addObject(new Line(p1, p2));
-        addObject(new Line(p1, p3));
-        addObject(new Line(p2, p4));
-        addObject(new Line(p3, p4));
+        Line l1 = new Line(p1, p2);
+        Line l2 = new Line(p1, p3);
+        Line l3 = new Line(p2, p4);
+        Line l4 = new Line(p3, p4);
 
-        addObject(new Line(p2, p3));
-        addObject(new Line(p1, p4));
+        Line l5 = new Line(p2, p3);
+        Line l6 = new Line(p1, p4);
+
+        Compound c = new Compound(0, 0);
+        c.addShape(a);
+        c.addShape(l1);
+        c.addShape(l2);
+        c.addShape(l3);
+        c.addShape(l4);
+        c.addShape(l5);
+        c.addShape(l6);
+
+        c.complete();
+
+        addObject(c);
 
         return true;
     }
@@ -699,30 +710,50 @@ public class CanvasView extends View {
         Point p3 = new Point(x1, y2);
         Point p4 = new Point(x2, y2);
 
-        addObject(new Line(p1, p2));
-        addObject(new Line(p1, p3));
-        addObject(new Line(p2, p4));
-        addObject(new Line(p3, p4));
+        Line l1 = new Line(p1, p2);
+        Line l2 = new Line(p1, p3);
+        Line l3 = new Line(p2, p4);
+        Line l4 = new Line(p3, p4);
 
         Arc a = new Arc(x1, y2, 300);
         a.setStart(110);
         a.setEnd(70);
-        addObject(a);
 
         Arc b = new Arc(x2, y2, 300);
         b.setStart(110);
         b.setEnd(70);
-        addObject(b);
 
         Point p3c = p3.clone();
 
-        addObject(new Line(p3c, a.startPoint()));
-        addObject(new Line(p3c, a.endPoint()));
+        Line l5 = new Line(p3c, a.startPoint());
+        Line l6 = new Line(p3c, a.endPoint());
 
         Point p4c = p4.clone();
 
-        addObject(new Line(p4c, b.startPoint()));
-        addObject(new Line(p4c, b.endPoint()));
+        Line l7 = new Line(p4c, b.startPoint());
+        Line l8 = new Line(p4c, b.endPoint());
+
+        Compound c1 = new Compound(0, 0);
+        c1.addShape(l1);
+        c1.addShape(l2);
+        c1.addShape(l3);
+        c1.addShape(l4);
+        c1.complete();
+        addObject(c1);
+
+        Compound c2 = new Compound(0, 0);
+        c2.addShape(a);
+        c2.addShape(l5);
+        c2.addShape(l6);
+        c2.complete();
+        addObject(c2);
+
+        Compound c3 = new Compound(0, 0);
+        c3.addShape(b);
+        c3.addShape(l7);
+        c3.addShape(l8);
+        c3.complete();
+        addObject(c3);
 
         return true;
     }
@@ -749,16 +780,19 @@ public class CanvasView extends View {
         Point p6 = new Point(x1, y3);
         Point p7 = new Point(x3, y3);
 
-        addObject(new Line(p1, p2));
-        addObject(new Line(p2, p3));
-        addObject(new Line(p1, p6));
-        addObject(new Line(p2, p4));
-        addObject(new Line(p3, p5));
-        addObject(new Line(p2, p5));
-        addObject(new Line(p3, p4));
-        addObject(new Line(p4, p5));
-        addObject(new Line(p5, p7));
-        addObject(new Line(p6, p7));
+        Compound c = new Compound(0, 0);
+        c.addShape(new Line(p1, p2));
+        c.addShape(new Line(p2, p3));
+        c.addShape(new Line(p1, p6));
+        c.addShape(new Line(p2, p4));
+        c.addShape(new Line(p3, p5));
+        c.addShape(new Line(p2, p5));
+        c.addShape(new Line(p3, p4));
+        c.addShape(new Line(p4, p5));
+        c.addShape(new Line(p5, p7));
+        c.addShape(new Line(p6, p7));
+        c.complete();
+        addObject(c);
 
         return true;
     }
@@ -791,23 +825,26 @@ public class CanvasView extends View {
         Point p7 = new Point(x4, y4);
         Point p8 = new Point(x3, y5);
 
+        Compound c = new Compound(0, 0);
         // top square
-        addObject(new Line(p1, p2));
-        addObject(new Line(p2, p3));
-        addObject(new Line(p3, p4));
-        addObject(new Line(p4, p1));
+        c.addShape(new Line(p1, p2));
+        c.addShape(new Line(p2, p3));
+        c.addShape(new Line(p3, p4));
+        c.addShape(new Line(p4, p1));
 
         // connect top and bottom
-        addObject(new Line(p1, p5));
-        addObject(new Line(p2, p6));
-        addObject(new Line(p3, p7));
-        addObject(new Line(p4, p8));
+        c.addShape(new Line(p1, p5));
+        c.addShape(new Line(p2, p6));
+        c.addShape(new Line(p3, p7));
+        c.addShape(new Line(p4, p8));
 
         // bottom square
-        addObject(new Line(p5, p6));
-        addObject(new Line(p6, p7));
-        addObject(new Line(p7, p8));
-        addObject(new Line(p8, p5));
+        c.addShape(new Line(p5, p6));
+        c.addShape(new Line(p6, p7));
+        c.addShape(new Line(p7, p8));
+        c.addShape(new Line(p8, p5));
+        c.complete();
+        addObject(c);
 
         return true;
     }

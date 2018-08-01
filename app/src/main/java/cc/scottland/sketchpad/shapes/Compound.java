@@ -84,8 +84,6 @@ public class Compound extends Point {
     public void draw(Canvas canvas, Paint p) {
 
         p.setColor(Color.WHITE);
-//        p.setStrokeWidth(3);
-//        canvas.drawCircle(x, y, 3, p);
 
         for (Shape shape : shapes) {
 
