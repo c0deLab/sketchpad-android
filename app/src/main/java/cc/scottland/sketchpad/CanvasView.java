@@ -190,10 +190,6 @@ public class CanvasView extends View {
     public boolean onKeyUp(int keyCode, KeyEvent event) {
 
         if (keyCode == 29) return clearCanvas();
-        if (keyCode == 30) {
-            System.exit(0);
-            return false;
-        }
 
         if (keyCode == 49) return loadFile1();
         if (keyCode == 50) return loadFile2();
